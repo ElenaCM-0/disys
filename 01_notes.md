@@ -1,0 +1,41 @@
+# To do:
+- Ask teacher:
+    level of complication:
+        + Can we assume all nodes have access to the same music files and just control that they play those music files at the same time?
+        + If not, then we will have a central node
+    People behind computers making choices: the nodes will not need to decide all that much.
+        + Would that be okay?
+    What exactly do we have to submit for the 15th the topic thing?
+
+# Notes:
+
+Achitecture:
+    Decentralised peer to peer
+
+Middleware:
+    Sockets
+    Not websockets because they are for web
+    We will not use message-based systems because we want real-time communication
+
+General idea:
+    Each node has their own music files which need not be on the other nodes
+    If a node wants to play syncronised music, it will share a request with the other nodes
+        For each node that joins, the main node will share the file, after checking with the node that it does not have it
+        Then, the main node will coordinate the music playing
+
+    There are three phases:
+        First, the node sends the request and all the nodes reply
+            If two nodes send a request, there is an election
+        Second, the node tries to share the file with the ones that don't have it
+        Third, the node coordinates the music player
+
+    Scalability:
+        We use something like gnutella but for request parties (REDESII P2P slide 15)
+        So the nodes are connected to other nodes but not all nodes
+        The idea is to have several small music parties as opposed to one big one
+        If a node wants to play, they will send a request to neighbouring nodes, these nodes will propagate the request
+            All the nodes that accept will share their ip address and port to generate a connection with the host
+
+        Once the host has received enough accepts, the playing party begins
+            The playing party begins when either 3 accepts are received or a timeout has passed
+    
