@@ -38,4 +38,8 @@ General idea:
 
         Once the host has received enough accepts, the playing party begins
             The playing party begins when either 3 accepts are received or a timeout has passed
-    
+
+Project description
+2-3 pages long 
+describe the topic, architecture (nodes and their roles), if it is going to have fases
+how nodes are going to communicate 
