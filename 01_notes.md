@@ -1,13 +1,13 @@
 # To do:
 - Ask teacher:
-    level of complication:
+   + level of complication:
         + Can we assume all nodes have access to the same music files and just control that they play those music files at the same time?
             We can assume all nodes have all the files. We don't need to do everythimng, but acknowledge the things
         + If not, then we will have a central node
-    People behind computers making choices: the nodes will not need to decide all that much.
+   + People behind computers making choices: the nodes will not need to decide all that much.
         + Would that be okay?
             People can make the decisions, don't overthink, have simple scenario
-    What exactly do we have to submit for the 15th the topic thing?
+   + What exactly do we have to submit for the 15th the topic thing?
 
 # Notes:
 
@@ -46,11 +46,11 @@ General idea:
         - One party, one song
         - Each party has a limit of songs to send, for example, five songs per party. Before starting the party, the host node will send all of the songs it wants to play.
         - The party starts when 5 songs have been shared when they are shared, the host can move only between these five songs. While these songs are playing, the host is sharing the rest of the songs in the background
-        - How about having playlists? Maybe the host node can chose a playlist and use some bittorrent deal for getting playlists?
+        - How about having playlists? Maybe the host node can chose a playlist and use some bittorrent deal for getting playlists????
 
     During the party:
         - The host node can skip the current song and chose the songs to play, only within the playing-pool shared
-        - Will other nodes be able to make music choices?
+        - Will other nodes be able to make music choices??
 
 Project description
 2-3 pages long 
