@@ -42,6 +42,16 @@ General idea:
         Once the host has received enough accepts, the playing party begins
             The playing party begins when either 3 accepts are received or a timeout has passed
 
+    General ideas for file transfer:
+        - One party, one song
+        - Each party has a limit of songs to send, for example, five songs per party. Before starting the party, the host node will send all of the songs it wants to play.
+        - The party starts when 5 songs have been shared when they are shared, the host can move only between these five songs. While these songs are playing, the host is sharing the rest of the songs in the background
+        - How about having playlists? Maybe the host node can chose a playlist and use some bittorrent deal for getting playlists?
+
+    During the party:
+        - The host node can skip the current song and chose the songs to play, only within the playing-pool shared
+        - Will other nodes be able to make music choices?
+
 Project description
 2-3 pages long 
 describe the topic, architecture (nodes and their roles), if it is going to have fases
