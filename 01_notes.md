@@ -2,9 +2,11 @@
 - Ask teacher:
     level of complication:
         + Can we assume all nodes have access to the same music files and just control that they play those music files at the same time?
+            We can assume all nodes have all the files. We don't need to do everythimng, but acknowledge the things
         + If not, then we will have a central node
     People behind computers making choices: the nodes will not need to decide all that much.
         + Would that be okay?
+            People can make the decisions, don't overthink, have simple scenario
     What exactly do we have to submit for the 15th the topic thing?
 
 # Notes:
