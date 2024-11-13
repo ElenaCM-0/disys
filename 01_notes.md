@@ -30,6 +30,7 @@ General idea:
             If two nodes send a request, there is an election
         Second, the node tries to share the file with the ones that don't have it
         Third, the node coordinates the music player
+            When the leader node is told to take an action, it will send a message to the other nodes: this action will be taken in UTC whatever time, that time being a few seconds ahead of the node's current time, to give the nodes time to receive the message and take the action
 
     Scalability:
         We use something like gnutella but for request parties (REDESII P2P slide 15)
@@ -40,4 +41,8 @@ General idea:
 
         Once the host has received enough accepts, the playing party begins
             The playing party begins when either 3 accepts are received or a timeout has passed
-    
+
+Project description
+2-3 pages long 
+describe the topic, architecture (nodes and their roles), if it is going to have fases
+how nodes are going to communicate 
