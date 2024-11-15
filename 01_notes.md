@@ -9,6 +9,9 @@
             People can make the decisions, don't overthink, have simple scenario
    + What exactly do we have to submit for the 15th the topic thing?
 
+# Things to think about
+- How does a node in the p2p network notice that the connection to other nodes is lost?
+- How do the heartbeat messages from the host work, if 30 secs have passed and I do not have a message, is it bc the host has failed or because there is a small delay?
 # Notes:
 
 **Achitecture:**
