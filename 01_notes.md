@@ -8,6 +8,9 @@
         + Would that be okay?
             People can make the decisions, don't overthink, have simple scenario
    + What exactly do we have to submit for the 15th the topic thing?
+   + Node discovery??? If I know a node's ip address, how do I connect to it taking into account NAT?
+      + You do not overcome NAT, use virtual machines or use hotspot or the computers in uni
+      + NAT traversal if we want to look it up
 
 # Things to think about
 - How does a node in the p2p network notice that the connection to other nodes is lost?
