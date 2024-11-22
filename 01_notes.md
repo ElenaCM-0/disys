@@ -70,13 +70,25 @@ We will not use message-based systems because we want real-time communication
 ### Tasks
 Each person should decide how their code with communicate with other people's code, for example, define the method definitions and variables that they have.
 
+# First week
+- Handle music playing. Have methods that other people can call for: playing a song, skipping to a certain number of seconds in a song (for when a node realises they have fallen behind), pause a song, skip a song forward, go back to the previous song. This person does not have to worry about communication with nodes, just handle the music playing. There should also be a method that can be called that will inform the user the current song and seconds.
 - In the P2P network, control when a node receives a message, decides if they will show it to the user, and sends it to other nodes.
 - Node accepts request (the person who does this can assume the node knows the ip and port to connect to, maybe on a method) and connects to host and host accepts or rejects node and creates thread and channels to communicate with that node.
-- Handle music playing. Have methods that other people can call for: playing a song, skipping to a certain number of seconds in a song (for when a node realises they have fallen behind), pause a song, skip a song forward, go back to the previous song. This person does not have to worry about communication with nodes, just handle the music playing. There should also be a method that can be called that will inform the user the current song and seconds.
+
+**Together**
+- Figure out hotspot connections
+- Put things together
+
+# Second week
 - Create playing party action requests and send them to the host. As host, process the requests and send them to the other nodes.
 - A non-host in the playing party receives a request, processes it and does what has to be done with it, this person must handle the: "this will happen at UTC x" thing.
+- User interface and communication.
+
+**Together**
+- Put things together
+
+# Third week 
+- Node discovery
 - Heartbeat
 - Fault tolerance
-- Something else?
-- User interface and communication.
 - Close threads and channels.
