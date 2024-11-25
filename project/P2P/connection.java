@@ -14,14 +14,16 @@ public class connection extends MySocket implements Runnable {
     private String peer;
     private boolean amFriend;
 
-    public connection(String peer, String ip, int port) throws UnknownHostException, IOException{
+    public connection(String peer, boolean friend, String ip, int port) throws UnknownHostException, IOException{
         super(ip, port);
         this.peer = peer;
+        this.amFriend = friend;
     }
 
-    public connection(String peer, Socket sock) throws UnknownHostException, IOException{
+    public connection(String peer, boolean friend, Socket sock) throws UnknownHostException, IOException{
         super(sock);
         this.peer = peer;
+        this.amFriend = friend;
     }
 
     /**
@@ -56,12 +58,14 @@ public class connection extends MySocket implements Runnable {
             while ((message = receive()) != null) {
                 switch (message.getString("type")) {
                     case "request_message":{
-                        if (!amFriend()) {
+                        if (!amFriend) {
                             /* The node who sent the message is not a friend, discard */
                             continue;
                         }
+
+                        /* Show the message to the user */
                     }
-                    default:{
+                    default: {
                         /* Malformed message, discard */
                         continue;
                     }
