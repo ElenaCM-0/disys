@@ -4,5 +4,7 @@ EC:
     - These threads, for now, are given the ip address and port that they must connect to and they start the connection
 - I will assume the user's "friends" are in a txt document in the same folder as the P2P node file. "Friends.txt"
     - I am also going to assume that the node id's are the names of the users and that they are unique. (So, in the messages, the sender id could be something like: "Elena123", which is the same thing that the user would have in it's "Friends.txt" file)
+    - The user cannot modify the "Friends.txt" file during a session. That is, if the user wants to modify their friend list, they must restart the program.
 - For now, I am throwing or ingnoring all of the exceptions
-- I am going to create an abstract class for threads in sockets to receive and send messages
+- I am going to create a class for sockets to send and receive messages in JSON form. It is called "MySocket".
+- The .sh files are just to run tests to check that things are working

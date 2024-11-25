@@ -1,29 +1,81 @@
 package P2P;
+
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.*;
+import java.util.Scanner;
 
-public class connection implements Runnable {
-    private Socket tunnel; // get the output stream from the socket.
-    ObjectOutputStream out;
-    ObjectInputStream in;
+import org.json.JSONObject;
 
-    public connection(String ip, int port) throws UnknownHostException, IOException{
-        tunnel = new Socket(ip, port);
+import utils.MySocket;
+
+public class connection extends MySocket implements Runnable {
+    private String peer;
+    private boolean amFriend;
+
+    public connection(String peer, String ip, int port) throws UnknownHostException, IOException{
+        super(ip, port);
+        this.peer = peer;
     }
 
+    public connection(String peer, Socket sock) throws UnknownHostException, IOException{
+        super(sock);
+        this.peer = peer;
+    }
+
+    /**
+     * This method will check the user's friend list and verify if the node this connection is with is added as a friend
+     * @return true if the connected node is a friend, false otherwisee
+    
+    private boolean amFriend() {
+        try {
+            File myObj = new File("filename.txt");
+            Scanner myReader = new Scanner(myObj);
+            while (myReader.hasNextLine()) {
+                String data = myReader.nextLine();
+                System.out.println(data);
+            }
+            myReader.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+    }
+     */
+
+    /**
+     * When this method is called, a new thread will listen in on the messages sent through this connection,
+     * dealing with them as they are received
+     */
     @Override
     public void run() {
+        JSONObject message;
+
         try {
-            out = new ObjectOutputStream(tunnel.getOutputStream());
+            while ((message = receive()) != null) {
+                switch (message.getString("type")) {
+                    case "request_message":{
+                        if (!amFriend()) {
+                            /* The node who sent the message is not a friend, discard */
+                            continue;
+                        }
+                    }
+                    default:{
+                        /* Malformed message, discard */
+                        continue;
+                    }
+                }
+                
+
+            }
         } catch (IOException e) {
             e.printStackTrace();
 
-            return;
+            return; 
         }
 
-
+        
     }
     
 }

@@ -1,3 +1,4 @@
+package utils;
 import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
@@ -41,6 +42,7 @@ public class MySocket {
      */
     public void send(JSONObject message) throws IOException {
         out.write(message.toString() + "\n");
+        out.flush();
     }
 
     /**
@@ -59,8 +61,6 @@ public class MySocket {
 
             return null;
         }
-
-        System.out.println("Received JSON: " + messageStr);
 
         return new JSONObject(messageStr);
     }
