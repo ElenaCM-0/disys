@@ -8,3 +8,9 @@ EC:
 - For now, I am throwing or ingnoring all of the exceptions
 - I am going to create a class for sockets to send and receive messages in JSON form. It is called "MySocket".
 - The .sh files are just to run tests to check that things are working
+
+CCV:
+- I will use a class called MusicPlayer to implement the functionalities related with handling music playing.
+- The class is initialized with a list of names of songs (the ones that will be played) and it allows to add new songs.
+- I've assumed the songs are stored in some folder called resources/songs. 
+- My part for this week is contained in the folder music_player. More information about its structure and how to execute it can be found in the README of that folder. 
