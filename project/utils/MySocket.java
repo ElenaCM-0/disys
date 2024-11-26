@@ -64,4 +64,11 @@ public class MySocket {
 
         return new JSONObject(messageStr);
     }
+
+
+    public Socket getSocket() {
+        return this.tunnel;  // return the socket object (tunnel)
+        // necessary for connection class (in project/P2P/accept_request_prototype)
+        // to work properly
+    }
 }
