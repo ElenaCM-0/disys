@@ -93,3 +93,34 @@ When doing the code, if you make any assumptions of what other people have done,
 - Heartbeat
 - Fault tolerance
 - Close threads and channels.
+
+Figure out playing party thing between connection and main:
+
+Main:
+
+- Has a variable last_request that is null if there are no requests
+- Has a variable answer that is null that is null unless the user has replied
+- Has a lock for the threads to control the access to these variables
+
+Steps:
+0- Waiting for user input
+1- I get a yes or a no
+2- I check if I last_request is null or not. If it is null, tell user: what was that? Back to step 0
+3- Changes variable answer to have the user's answer
+
+if the answer was no, go back to 0
+
+if the answer was yes, move on to playing party joining etc
+
+Connection:
+0- Waiting for messages
+1- I get a request
+2- Acquire lock for asking user
+3- Set myself as the last_request in main
+4- Set answer to be null
+5- wait for answer to not be null
+6- When answer is not null, read what it is,
+
+if answer is false, go back to 0
+
+if answer is true, continue to playing party member
