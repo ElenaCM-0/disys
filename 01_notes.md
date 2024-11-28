@@ -101,26 +101,84 @@ Main:
 - Has a variable last_request that is null if there are no requests
 - Has a variable answer that is null that is null unless the user has replied
 - Has a lock for the threads to control the access to these variables
+- Has a bool variable called host to indicate if the user has requested a playing party
 
 Steps:
 0- Waiting for user input
-1- I get a yes or a no
-2- I check if I last_request is null or not. If it is null, tell user: what was that? Back to step 0
-3- Changes variable answer to have the user's answer
-
-if the answer was no, go back to 0
-
-if the answer was yes, move on to playing party joining etc
+1- Set host to true
+2- I check if I last_request is null or not. i. e. if there is a thread waiting for answer
+    3.a - There is a thread waiting for answer
+        3.a.a. - The input was Yes/ no
+            3.a.a.1 - Changes variable answer to have the user's answer
+                If the answer was no, go back to 0
+                If the answer was yes, move on to playing party joining etc
+        3.a.b. - The input was "party"
+                    This means that the user said that they wanted to do a playing party and then got a request
+            3.a.b.1 - Wait for yes/no input of request
+            3.a.b.2 - Changes variable answer to have the user's answer
+                If the answer was no, go to creating a playing party
+                If the answer was yes, move on to playing party joining etc and then return to 0
+    3.b There is no thread waiting
+        3.b.a - If command was not party, tell user: what was that? Back to step 0
+        3.b.b - If command was party, move on to creating a playing party.
 
 Connection:
 0- Waiting for messages
-1- I get a request
-2- Acquire lock for asking user
-3- Set myself as the last_request in main
-4- Set answer to be null
-5- wait for answer to not be null
-6- When answer is not null, read what it is,
 
-if answer is false, go back to 0
+CASE 1:
+1- I get a request
+2- If host is true, ignore request, back to 0
+If host is false:
+3- Acquire lock for asking user (request)
+4- Check if host is true:
+    If host is true, back to 0
+    If host is false
+5- Set myself as the last_request in main
+6- Set answer to be null
+7- Ask user
+8- wait for answer to not be null
+9- When answer is not null, read what it is,
+
+if answer is false, 
+    10- Free lock
+    11- go back to 0
 
 if answer is true, continue to playing party member
+    Remember to release lock at some point
+
+CASE 2:
+
+1- I get a playing party response
+2- If host is false, ignore, back to 0
+If host is true:
+3- Acquire lock for asking user (response)
+4- Set myself as the last_response in main
+5- Set response_answer to be null
+6- Ask user
+7- wait for answer to not be null
+8- When answer is not null, read what it is
+
+If answer is false
+    Exit thread, finish execution
+
+If answer is true, continue to playing party whatever
+
+## Within playing party
+
+##### Host
+
+- Threads:
+ - 1 thread per connection
+ - 1 thread for hearbeat
+ - 1 thread for main (listening on user input)
+ - 1 thread for music player
+- There is a lock to control who will add the next action
+
+Whoever gets the lock:
+- Calculate when the change has to occur
+- Tells the player when the change needs to occur and what the action is
+
+## Things to think about
+
+- When/how to make playing list (in main)
+- Same person to do the main adds change to player and player adds change
