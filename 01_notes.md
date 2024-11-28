@@ -77,18 +77,41 @@ Hard tasks:
 - Playing thread + update class
     - This person will take care of the circle in the class diagram. That is, they will take care of all of the music playing, the methods that indicate that a song change is to be added and making those changes happen.
     - They will also have to create the class Update
+    - They will have to implement the method in the main class which makes the changes in the Music Player (this is the method connections will call in the sendActionRequest method).
+
 - Main menu when there is playing party
     - This person will create the menu that will be displayed while the user is in the playing party. This menu is in the terminal, there is no need for interface and will be in the main class. The user will be given options for song modifications: play, pause, skip, go backwards. The person who does this task will get the command from the user, and call the pertinent methods in connection. This person does not have to implement the methods in connection that will take care of these commands.
     - This person will have to take into account, when receiving a command from the user that it might be a response to a heartbeat promt and will have to deal with it accordingly (see notes in the class diagram around heartbeat)
-- Connection for the playing party host
-    -
-- Connection for the playing party member
+    - This menu will be the same for host and members.
+
+- Connection for the playing party host:
+    - ![alt text](image.png)
+    - This person will have to take care of the connection thread for the host: listen to the requests from the clients and update the music player and inform the rest of the nodes.
+    - This person has to do the method sendActionRequest which calculates the time in which the action will be executed, sends the messages and calls the method in the main to make the changes in the MusicPlayer.This person doesn't have to implement the method in the main.
+    - The same method can be can called when the user makes a request by terminal and when it receives a request from the members.
+
+- Main menu when there is no playing party
+    - Read steps bellow (follow all of the steps until "connection")
 
 Easy tasks:
-- Main menu when there is no playing party
+- Connection for the playing party member:
+    - ![alt text](image-1.png)
+    - This person will have to take care of the connection thread for the members: listen to the host requests and make the changes to the music player. 
+    
 - Connection for a non-playing party member
+    - ![alt text](image-2.png)
+    - Implement shared info class
+    - Follow the steps below from "connection"
+
+
 - Menu playing party chose songs and order
+    - This person creates a method which asks the user which songs it wants to play and returns the list of songs (name of the song files).
+    - It has to check if the songs given exist. 
+    - This person also has to implement the part of the main which calls this method (and add the songs to the music player).
+
 - Heartbeat threads
+    - ![alt text](image-3.png)
+    - ![alt text](image-4.png)
 
 ## Algorithms
 
