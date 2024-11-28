@@ -71,28 +71,26 @@ We will not use message-based systems because we want real-time communication
 Each person should decide how their code with communicate with other people's code, for example, define the method definitions and variables that they have.
 When doing the code, if you make any assumptions of what other people have done, inform and write them down so that putting things together is as easy as possible.
 
-# First week (to be done before class on the 27th of November)
-- Handle music playing. Have methods that other people can call for: playing a song, skipping to a certain number of seconds in a song (for when a node realises they have fallen behind), pause a song, skip a song forward, go back to the previous song. This person does not have to worry about communication with nodes, just handle the music playing. There should also be a method that can be called that will inform the user the current song and seconds.
-- In the P2P network, control when a node receives a message, decides if they will show it to the user, and sends it to other nodes.
-- Node accepts request (the person who does this can assume the node knows the ip and port to connect to, maybe on a method) and connects to host and host accepts or rejects node and creates thread and channels to communicate with that node.
-- User interface and communication. Doing the 'main'
+# For next week (to be done before class on the 04th of December)
 
-**Together**
-- Figure out hotspot connections
-- Put things together
+Hard tasks:
+- Playing thread + update class
+    - This person will take care of the circle in the class diagram. That is, they will take care of all of the music playing, the methods that indicate that a song change is to be added and making those changes happen.
+    - They will also have to create the class Update
+- Main menu when there is playing party
+    - This person will create the menu that will be displayed while the user is in the playing party. This menu is in the terminal, there is no need for interface and will be in the main class. The user will be given options for song modifications: play, pause, skip, go backwards. The person who does this task will get the command from the user, and call the pertinent methods in connection. This person does not have to implement the methods in connection that will take care of these commands.
+    - This person will have to take into account, when receiving a command from the user that it might be a response to a heartbeat promt and will have to deal with it accordingly (see notes in the class diagram around heartbeat)
+- Connection for the playing party host
+    -
+- Connection for the playing party member
 
-# Second week (to be done before class on the 4th of December)
-- Create playing party action requests and send them to the host. As host, process the requests and send them to the other nodes.
-- A non-host in the playing party receives a request, processes it and does what has to be done with it, this person must handle the: "this will happen at UTC x" thing.
+Easy tasks:
+- Main menu when there is no playing party
+- Connection for a non-playing party member
+- Menu playing party chose songs and order
+- Heartbeat threads
 
-**Together**
-- Put things together
-
-# Third week (to be done before the 9th of December)
-- Node discovery
-- Heartbeat
-- Fault tolerance
-- Close threads and channels.
+## Algorithms
 
 Figure out playing party thing between connection and main:
 
@@ -182,3 +180,5 @@ Whoever gets the lock:
 
 - When/how to make playing list (in main)
 - Same person to do the main adds change to player and player adds change
+
+####
