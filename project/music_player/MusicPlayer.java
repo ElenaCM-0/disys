@@ -1,8 +1,7 @@
 package music_player;
 
 import java.nio.file.Paths;
-import java.util.List;ç
-
+import java.util.List;
 
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -176,7 +175,7 @@ public class MusicPlayer {
         }
     }
 
-    public TimeStamp getPosition(long time){
+    public TimeStamp getPosition(long time) {
 
     }
 }
