@@ -65,10 +65,28 @@ public class MySocket {
         return new JSONObject(messageStr);
     }
 
-
-    public Socket getSocket() {
-        return this.tunnel;  // return the socket object (tunnel)
-        // necessary for connection class (in project/P2P/accept_request_prototype)
-        // to work properly
+    /**
+     * Receives a message of the given type through the socket. It will discard all other messages
+     * A call to this is blocking. It will wait until a message is received
+     * 
+     * @param type The message type that the user expects to receive
+     * 
+     * @return The JSON object that was received
+     * @throws IOException
+     */
+    public JSONObject receive(String type) throws IOException{
+        String messageStr;
+        JSONObject message; 
+        
+        while (true) {
+            messageStr = in.readLine();
+                    
+            if (messageStr == null) return null;
+    
+            message = new JSONObject(messageStr);
+    
+            if (message.getString("type").equals(type))
+                return message;
+        }
     }
 }

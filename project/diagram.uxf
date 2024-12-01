@@ -1,4 +1,4 @@
-<diagram program="umletino" version="15.1"><zoom_level>7</zoom_level><element><id>UMLClass</id><coordinates><x>350</x><y>0</y><w>252</w><h>259</h></coordinates><panel_attributes>Main (singleton)
+<diagram program="umletino" version="15.1"><zoom_level>10</zoom_level><element><id>UMLClass</id><coordinates><x>300</x><y>0</y><w>360</w><h>370</h></coordinates><panel_attributes>Main (singleton)
 --
 - list of connections
 - name of the user (ask user)
@@ -11,7 +11,9 @@
 - lock por playing party actions
 - Has music player
 - variable storing whether the user has not 
-   heard from the host of playing party
+   heard from the host of playing party (heartbeat)
+- the amount of time that is needed for a message to reach all 
+   playing party members
 -
 - join  network
 - show playing party request 
@@ -20,73 +22,73 @@
 - create playing party
 - send request to all connections
 - add action (creates change, sends message, 
-  adds change to player thread)</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>623</x><y>448</y><w>182</w><h>98</h></coordinates><panel_attributes>connection (it is a thread)
+  adds change to player thread)</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>920</x><y>660</y><w>290</w><h>100</h></coordinates><panel_attributes>/connection/
 --
 - name (who you are connected to)
 - socket (mySocket)
-- response time (calculates somehow)
 --
-- run (listens on the socket)
-# (class method) get max response time</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>497</x><y>658</y><w>189</w><h>84</h></coordinates><panel_attributes>host connection
+- mutate (receives party con, returns P2P con)
+- mutate (receives P2P con, returns party con)</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>570</x><y>940</y><w>270</w><h>120</h></coordinates><panel_attributes>host connection
 --
 - run (for host)
 - sendActionRequest (adds change to 
     music player (with main method) and sends
-    action message to members</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>707</x><y>658</y><w>189</w><h>84</h></coordinates><panel_attributes>member connection
+    action message to members</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>870</x><y>940</y><w>270</w><h>120</h></coordinates><panel_attributes>member connection
 --
 - run (as member. when it gets a request, 
          add change to main's music player)
 - sendActionRequest (sends an action 
-           request to the host)</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>623</x><y>609</y><w>49</w><h>63</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>50;10;10;70</additional_attributes></element><element><id>Relation</id><coordinates><x>742</x><y>609</y><w>28</w><h>63</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;20;70</additional_attributes></element><element><id>UMLClass</id><coordinates><x>721</x><y>182</y><w>175</w><h>70</h></coordinates><panel_attributes>music player
+           request to the host)</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>800</x><y>870</y><w>30</w><h>90</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;70</additional_attributes></element><element><id>Relation</id><coordinates><x>910</x><y>870</y><w>30</w><h>90</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;70</additional_attributes></element><element><id>UMLClass</id><coordinates><x>830</x><y>260</y><w>250</w><h>100</h></coordinates><panel_attributes>music player
 --
 - list of songs
 - media player (thing that plays music)
 -
-- playing methods</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>686</x><y>28</y><w>161</w><h>63</h></coordinates><panel_attributes>SharedInfo
+- playing methods</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>780</x><y>40</y><w>230</w><h>90</h></coordinates><panel_attributes>SharedInfo
 --
 - lock
 - answer
 - waiting_connection
 --
 
-</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>945</x><y>154</y><w>175</w><h>70</h></coordinates><panel_attributes>music player thread
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1150</x><y>220</y><w>250</w><h>100</h></coordinates><panel_attributes>music player thread
 --
 - list of changes
 - music player
 -
-- add change method</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1029</x><y>56</y><w>175</w><h>63</h></coordinates><panel_attributes>update
+- add change method
+- create update method</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1270</x><y>80</y><w>250</w><h>90</h></coordinates><panel_attributes>update
 --
 - play/pause
 - UTC time of action
 - song and timestamp
-- number of updates at time of sending</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLUseCase</id><coordinates><x>896</x><y>0</y><w>497</w><h>287</h></coordinates><panel_attributes>TBD by whomever does the player</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1141</x><y>175</y><w>105</w><h>77</h></coordinates><panel_attributes>&lt;&lt;enum&gt;&gt; action
+- number of updates at time of sending</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLUseCase</id><coordinates><x>1080</x><y>0</y><w>710</w><h>410</h></coordinates><panel_attributes>TBD by whomever does the player</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1430</x><y>250</y><w>150</w><h>110</h></coordinates><panel_attributes>&lt;&lt;enum&gt;&gt; action
 --
 + play, pause, skip, etc
 --
 - action name
-- action function</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>595</x><y>98</y><w>315</w><h>63</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>430;70;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>623</x><y>567</y><w>189</w><h>49</h></coordinates><panel_attributes>/party connection/
+- action function</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>650</x><y>140</y><w>450</w><h>90</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>430;70;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>740</x><y>810</y><w>270</w><h>70</h></coordinates><panel_attributes>/party connection/
 --
 --
-- abstract sendActionRequest</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>707</x><y>539</y><w>21</w><h>42</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;40</additional_attributes></element><element><id>UMLClass</id><coordinates><x>140</x><y>518</y><w>161</w><h>63</h></coordinates><panel_attributes>Host heartbeat (implements thread)
---
---
-- run
-
-
-</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>322</x><y>518</y><w>161</w><h>63</h></coordinates><panel_attributes>Member hearbeat (implements thread)
+- abstract sendActionRequest</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>970</x><y>750</y><w>30</w><h>80</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;60</additional_attributes></element><element><id>UMLClass</id><coordinates><x>0</x><y>740</y><w>230</w><h>90</h></coordinates><panel_attributes>Host heartbeat (implements thread)
 --
 --
 - run
 
 
-</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLNote</id><coordinates><x>1225</x><y>49</y><w>119</w><h>84</h></coordinates><panel_attributes>The number of changes
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>260</x><y>740</y><w>230</w><h>90</h></coordinates><panel_attributes>Member hearbeat (implements thread)
+--
+--
+- run
+
+
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLNote</id><coordinates><x>1550</x><y>70</y><w>170</w><h>120</h></coordinates><panel_attributes>The number of changes
 is added so that the nodes
 can check who is more
 updated: them or the 
 heartbeat. That is, if the 
-hearrbeat has less changes
+heartbeat has less changes
 than them, ignore
-bg=blue</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLNote</id><coordinates><x>350</x><y>266</y><w>259</w><h>133</h></coordinates><panel_attributes>Heartbeat thread wakes up
+bg=blue</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLNote</id><coordinates><x>300</x><y>380</y><w>370</w><h>190</h></coordinates><panel_attributes>Heartbeat thread wakes up
 If it has heard from the host recently enough, back to sleep
 If too long has passed, it will change the variable in the main, 
 to indicate to the main that the host has been disconnected
@@ -98,18 +100,23 @@ On the side of the main:
 
 gets a yes/no and checks if it is related to heartbeat. 
 act accordingly
-bg=yellow</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>238</x><y>427</y><w>161</w><h>63</h></coordinates><panel_attributes>/hearbeat (implements thread)/
+bg=yellow</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>140</x><y>610</y><w>230</w><h>90</h></coordinates><panel_attributes>/hearbeat (implements thread)/
 --
 - stores the time of the latest update
 --
 - lastUpdate(receives a time)
 
 
-</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>343</x><y>483</y><w>21</w><h>49</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;50</additional_attributes></element><element><id>Relation</id><coordinates><x>259</x><y>483</y><w>21</w><h>49</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;50</additional_attributes></element><element><id>UMLNote</id><coordinates><x>140</x><y>595</y><w>161</w><h>84</h></coordinates><panel_attributes>Heartbeat thread wakes up
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>290</x><y>690</y><w>30</w><h>70</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;50</additional_attributes></element><element><id>Relation</id><coordinates><x>170</x><y>690</y><w>30</w><h>70</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;50</additional_attributes></element><element><id>UMLNote</id><coordinates><x>0</x><y>850</y><w>230</w><h>120</h></coordinates><panel_attributes>Heartbeat thread wakes up
 If it has sent a message recently 
 enough, back to sleep
 If too long has passed, send a 
 message with the expected song 
 and timestamp and UTC time to 
 the members
-bg=yellow</panel_attributes><additional_attributes></additional_attributes></element></diagram>
+bg=yellow</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1100</x><y>810</y><w>260</w><h>90</h></coordinates><panel_attributes>P2P connection (it is a thread)
+--
+- response time (calculates somehow)
+--
+- run (listens on the socket)
+# (class method) get max response time</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>1120</x><y>750</y><w>30</w><h>80</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;60</additional_attributes></element></diagram>

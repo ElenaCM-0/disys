@@ -87,7 +87,7 @@ Hard tasks:
 - Connection for the playing party host:
     - ![alt text](image.png)
     - This person will have to take care of the connection thread for the host: listen to the requests from the clients and update the music player and inform the rest of the nodes.
-    - This person has to do the method sendActionRequest which calculates the time in which the action will be executed, sends the messages and calls the method in the main to make the changes in the MusicPlayer.This person doesn't have to implement the method in the main.
+    - This person has to do the method sendActionRequest which calculates the time in which the action will be executed, sends the messages and calls the method in the main to make the changes in the MusicPlayer. This person doesn't have to implement the method in the main.
     - The same method can be can called when the user makes a request by terminal and when it receives a request from the members.
 
 - Main menu when there is no playing party

@@ -1,15 +1,20 @@
-EC: 
+### EC: 
 **New things**
-- I will implement the nodes in the P2P network as a class. This class will have a thread per connection in the P2P network, but the class itself is not a thread. This is, if you are to call one of the methods in the class, it will be the main program that executes them.
-    - These threads, for now, are given the ip address and port that they must connect to and they start the connection
-- I will assume the user's "friends" are in a txt document in the same folder as the P2P node file. "Friends.txt"
-    - I am also going to assume that the node id's are the names of the users and that they are unique. (So, in the messages, the sender id could be something like: "Elena123", which is the same thing that the user would have in it's "Friends.txt" file)
-    - The user cannot modify the "Friends.txt" file during a session. That is, if the user wants to modify their friend list, they must restart the program.
-- For now, I am throwing or ingnoring all of the exceptions
-- I am going to create a class for sockets to send and receive messages in JSON form. It is called "MySocket".
-- The .sh files are just to run tests to check that things are working
+- I am going to create a folder connection for ![alt text](image-5.png) this part of the diagram. I am also going to take out connection.java from the P2P folder, because I don't think it makes sense for it to be there anymore I am also going to create the abstract class party connection inside a folder called party. My idea is to put in that folder all of the playing-party related files and classes
+- I have also created the enum Action, but it is not complete.
+    - It has a method match that, given a string, it will return the element in the enum it matches. Or null if it's none of them
+- I have somewhat changed the connection part of the class diagram, for it to make a bit more sense
+- The friends list and everything no longer exists
+- I am going to add a method in connection receive(String type) this method is the same as receive, only that it will only return if the message type is the one given. It wil discard all other messages
+- If, as the host, I get null in a socket, I will close it and assume that person is no longer in the playing party
+- The main stores the time it took for the users to reply to the playing party request
+- For UTC time I am using the seconds since EPOCH 
 
-CCV:
+**Questions**
+- What do we do with exeptions?
+- Why are the methods in main private static?
+
+### CCV:
 - I will use a class called MusicPlayer to implement the functionalities related with handling music playing.
 - The class is initialized with a list of names of songs (the ones that will be played) and it allows to add new songs.
 - I've assumed the songs are stored in some folder called resources/songs. 
