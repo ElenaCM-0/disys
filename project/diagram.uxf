@@ -61,12 +61,12 @@
 - play/pause
 - UTC time of action
 - song and timestamp
-- number of updates at time of sending</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLUseCase</id><coordinates><x>1080</x><y>0</y><w>710</w><h>410</h></coordinates><panel_attributes>TBD by whomever does the player</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1430</x><y>250</y><w>150</w><h>110</h></coordinates><panel_attributes>&lt;&lt;enum&gt;&gt; action
+- number of updates at time of sending</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLUseCase</id><coordinates><x>1100</x><y>10</y><w>710</w><h>410</h></coordinates><panel_attributes>TBD by whomever does the player</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1430</x><y>250</y><w>150</w><h>110</h></coordinates><panel_attributes>&lt;&lt;enum&gt;&gt; action
 --
 + play, pause, skip, etc
 --
 - action name
-- action function</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>650</x><y>140</y><w>450</w><h>90</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>430;70;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>740</x><y>810</y><w>270</w><h>70</h></coordinates><panel_attributes>/party connection/
+- action function</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>650</x><y>140</y><w>470</w><h>100</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>450;80;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>740</x><y>810</y><w>270</w><h>70</h></coordinates><panel_attributes>/party connection/
 --
 --
 - abstract sendActionRequest</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>970</x><y>750</y><w>30</w><h>80</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;60</additional_attributes></element><element><id>UMLClass</id><coordinates><x>0</x><y>740</y><w>230</w><h>90</h></coordinates><panel_attributes>Host heartbeat (implements thread)

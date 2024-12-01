@@ -2,6 +2,10 @@ package main;
 import java.util.Scanner;
 import utils.MySocket;
 import java.util.concurrent.*;
+
+import music_player.MusicPlayer;
+import party.heartbeat.Heartbeat;
+
 import java.time.*;
 import java.time.temporal.*;
 import java.util.Date;
@@ -10,7 +14,8 @@ public class Main {
     private static boolean isParty = false;
     private static String partyOrganizer = "";
     private static Main instance = null;
-    
+    private MusicPlayer musicPlayer;
+    private Heartbeat heartbeat;
     int port;
     
     String song;
@@ -44,8 +49,17 @@ public class Main {
      * time to take all of the actions
      * @return
      */
-    public int getSeconds() {
-        /** TO DO **/
+    private int getSeconds() {
+        /** TODO **/
+    }
+
+    /**
+     * This method will return the timestamp when the nearest change can be implemented
+     * 
+     * @return the timestamp when the nearest change can be implemented
+     */
+    public long getNearestChange() {
+        return Instant.now().getEpochSecond() + getSeconds();
     }
 
     private static void startParty(Scanner scanner) {
@@ -71,6 +85,14 @@ public class Main {
 
         }
         else {}
+
+        public MusicPlayer getMusicPlayer() {
+            return musicPlayer;
+        }
+
+        public Heartbeat getHeartbeat() {
+            return heartbeat;
+        }
         
 
     }

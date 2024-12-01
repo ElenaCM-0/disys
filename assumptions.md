@@ -8,11 +8,22 @@
 - I am going to add a method in connection receive(String type) this method is the same as receive, only that it will only return if the message type is the one given. It wil discard all other messages
 - If, as the host, I get null in a socket, I will close it and assume that person is no longer in the playing party
 - The main stores the time it took for the users to reply to the playing party request
+    - To handle this I have added two methods:
+        - getSeconds (private, it will return the seconds the time it took for the users to reply to the playing party request)
+        - getNearestChange (public, taking into account the seconds it took to reply and the current time, it returns the time the next change can take place)
 - For UTC time I am using the seconds since EPOCH 
+- The fields in the action message are as follows:
+    ret.put("action", status.toString());
+    ret.put("action_timestamp", executionTime);
+    ret.put("song_name", songName);
+    ret.put("song_time", songTime);
+    ret.put("total_updates", num_updates - 1);
 
 **Questions**
 - What do we do with exeptions?
 - Why are the methods in main private static?
+- It would make sense for the music player to have a method to figure out if a user is out of sync or not, or to determine if any changes need to be made (so that the music doesn't jump around with the heartbeats unnecessarily). What do you think?
+- Reset update counter, is it correct to be sending the num_updates with a -1?
 
 ### CCV:
 - I will use a class called MusicPlayer to implement the functionalities related with handling music playing.

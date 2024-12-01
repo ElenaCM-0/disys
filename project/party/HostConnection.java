@@ -7,6 +7,9 @@ import java.time.Instant;
 import org.json.JSONObject;
 
 import main.Main;
+import music_player.Update;
+import party.heartbeat.Heartbeat;
+import test.MusicPlayer;
 import utils.MySocket;
 
 public class HostConnection extends PartyConnection{
@@ -42,8 +45,12 @@ public class HostConnection extends PartyConnection{
 
     @Override
     public void sendActionRequest(Action act) {
-        int seconds_ahead = Main.getInstance().getSeconds();
-        long new_time = Instant.now().getEpochSecond() + seconds_ahead;
+        Main main = Main.getInstance();
+        Long time = main.getNearestChange();
+
+        Update update = MusicPlayer.createUpdate(time, act);
+        
+        main.getHeartbeat().lastUpdate(time);
         
         
     }

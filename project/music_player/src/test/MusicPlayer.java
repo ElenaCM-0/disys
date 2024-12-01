@@ -1,13 +1,15 @@
 package test;
 
 import javafx.util.Duration;
+import music_player.Update;
+import music_player.exceptions.ExceededTimeException;
+import music_player.exceptions.NoMoreSongsException;
+import music_player.exceptions.SongNotFoundException;
+import party.Action;
 
 import java.nio.file.Paths;
 import java.util.List;
 
-import exceptions.ExceededTimeException;
-import exceptions.NoMoreSongsException;
-import exceptions.SongNotFoundException;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 
@@ -156,5 +158,10 @@ public class MusicPlayer {
             this.player = createPlayer(songs.get(index));
             throw new SongNotFoundException(newSong);
         }
+    }
+
+    public static Update createUpdate(long nearestChange, Action act) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'createUpdate'");
     }
 }
