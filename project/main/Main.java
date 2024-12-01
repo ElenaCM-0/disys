@@ -29,33 +29,47 @@ public class Main {
     
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("If you want to start a party, write party");
         // implement here part to connect to a party or start a party
-        String input =scanner.nextLine();
-        if (input.equals("party")){
-            askUserSongs(scanner);
 
-        }
-        // if you are in a party:
-        Connection connection=new Connection();
-        System.out.println("You are in a party! You can use either of these commands:"
-                + "- play: if you want to play de music"
-        		+ "- pause: if you want to stop the song"
-        		+ "- forward: if you want to skip to the next song"
-        		+ "- backward: if you want to go back to the previous song"
-        		+ "Note: if your request is not posible to execute (f.e you skip and it is the last song), your request will be ignored");
-        String action = scanner.nextLine();
-        Action matchedAction = Action.match(action);
-        if (matchedAction != null) {
-            connection.sendActionRequest(matchedAction);
-        }
-        else if (action.equals("Y") || action.equals("N")){
+        // if you are not in a party
+        if (!isParty) {
+            //shows options to start or join party
+            System.out.println("You are not currently in a party");
+            System.out.println("Type 'party' to start a new party or 'join' to join an existing party");
+            String input = scanner.nextLine();
+        
+            if (input.equals("party")) {
+                askUserSongs(scanner);
+                startParty(scanner); //TODO by Niklas?
+            } 
+            else if (input.equals("join")) {
+                inviteParty(scanner);
+            }
+            else {
+                System.out.println("Invalid option; please type 'party' or 'join'");
+            }
+        } 
+        else {
+            // if you are in a party:
+            Connection connection=new Connection();
+            System.out.println("You are in a party! You can use either of these commands:"
+                    + "- play: if you want to play de music"
+                    + "- pause: if you want to stop the song"
+                    + "- forward: if you want to skip to the next song"
+                    + "- backward: if you want to go back to the previous song"
+                    + "Note: if your request is not posible to execute (f.e you skip and it is the last song), your request will be ignored");
+            String action = scanner.nextLine();
+            Action matchedAction = Action.match(action);
+            if (matchedAction != null) {
+                connection.sendActionRequest(matchedAction);
+            }
+            else if (action.equals("Y") || action.equals("N")){
 
+            }
+            else{
+                System.out.print("The action you entered is not one of the available options");
+            }
         }
-        else{
-            System.out.print("The action you entered is not one of the available options");
-        }
-    }
 
     public static Main getInstance() {
         if (instance == null) instance = new Main();
@@ -82,9 +96,15 @@ public class Main {
         return Instant.now().getEpochSecond() + getSeconds();
     }
 
+
     private static void startParty(Scanner scanner) {
-        
+        //TODO by Niklas?
+        isParty = true
+        partyOrganizer = "You"
+        System.out.println("You have started a party");
+        //...
     }
+
 
     /**
      * Asks the user to select songs from a list of available songs and adds them to a party playlist.
