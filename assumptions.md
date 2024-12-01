@@ -25,6 +25,13 @@
 - It would make sense for the music player to have a method to figure out if a user is out of sync or not, or to determine if any changes need to be made (so that the music doesn't jump around with the heartbeats unnecessarily). What do you think?
 - Reset update counter, is it correct to be sending the num_updates with a -1?
 
+### CCV (For the 4th of December)
+- I have used miliseconds since Epoch for UTC time and the class Duration from javafx.util (don't get confuse with other existent Duration classes in Java) to represent a certain instant in a song. E.g. if we are playing a song at 2pm and the song its currently playing the instant 0:30, 3pm is represented in UTC time and 0:30 in Duration.  
+- SongInstant represents a song (known by its name) and a certain instant of the song,
+- Call method getPosition(long time) to know what the music player will be doing at a certain time (taking into account the updates that the player has received until the moment is called). 
+- Class Status to represent if the player is currently paused or playing
+- MessageType added to represent the different types of messages. Feel free to add new ones you may need. 
+
 ### CCV:
 - I will use a class called MusicPlayer to implement the functionalities related with handling music playing.
 - The class is initialized with a list of names of songs (the ones that will be played) and it allows to add new songs.

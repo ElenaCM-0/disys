@@ -1,5 +1,7 @@
 package music_player;
 
+import javafx.scene.media.MediaPlayer;
+
 public enum Status {
     PLAYING("playing"), PAUSED("paused");
 
@@ -22,10 +24,17 @@ public enum Status {
      */
     public static Status match(String status) {
         for (Status s : Status.values()) {
-            if ((s.command).equals(status))
+            if ((s.status).equals(status))
                 return s;
         }
 
         return null;
+    }
+
+    public static Status transform(MediaPlayer.Status st) {
+        if (st == MediaPlayer.Status.PLAYING) {
+            return Status.PLAYING;
+        }
+        return Status.PAUSED;
     }
 }

@@ -40,6 +40,6 @@ public class MemberConnection extends PartyConnection {
         JSONObject message = new JSONObject();
         message.put("type", MessageType.ACTION_REQUEST.toString());
         message.put("command", act.toString());
-        this.socket.send(message.toString());
+        this.socket.send(message);
     }
 }

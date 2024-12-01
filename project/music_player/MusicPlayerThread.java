@@ -9,6 +9,8 @@ import java.util.concurrent.TimeUnit;
 
 import javax.swing.Action;
 
+import utils.SongInstant;
+
 public class MusicPlayerThread {
 
     private MusicPlayer mp;
@@ -19,9 +21,28 @@ public class MusicPlayerThread {
     }
 
     public void createUpdate(Action action, long executionTime) {
-        
+
     }
 
+    public SongInstant getPosition(long time) {
+
+        if (updates.isEmpty()) {
+            return this.mp.getSongInstantFromNow(time);
+        }
+
+        Update lastUpdate = this.updates.getLast();
+        SongInstant lastInstant = lastUpdate.geSongInstant();
+        if (lastUpdate.getStatus() == Status.PAUSED) {
+            return lastInstant;
+        }
+
+        return this.mp.getSongInstantFrom(lastInstant, lastUpdate.getExecutionTime(), time);
+
+    }
+
+    // Example about how to implement doing an action in a certain UTC time. I
+    // copied it just to have the idea abou how the process is done. This is not
+    // final code at all
     public static void main(String[] args) {
         // Define el tiempo UTC deseado
         Instant targetTime = Instant.parse("2024-11-27T15:00:00Z");

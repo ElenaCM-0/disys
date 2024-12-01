@@ -1,6 +1,7 @@
 package music_player;
 
 import java.nio.file.Paths;
+import java.time.Instant;
 import java.util.List;
 
 import javafx.scene.media.Media;
@@ -8,14 +9,16 @@ import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import music_player.exceptions.BeforeStartException;
 import music_player.exceptions.ExceededTimeException;
+import music_player.exceptions.FatalMPError;
 import music_player.exceptions.NoMoreSongsException;
 import music_player.exceptions.SongNotFoundException;
+import utils.SongInstant;
 
 public class MusicPlayer {
     private static final String BASE_URL = "/songs/";
     private List<String> songs;
     private MediaPlayer player;
-    private int index = 0;
+    private int currentIndex = 0;
 
     /**
      * Creates a MediaPlayer object for a certain song
@@ -31,10 +34,10 @@ public class MusicPlayer {
             Media media = new Media(audioFilePath);
             player = new MediaPlayer(media);
             player.setOnEndOfMedia(() -> {
-                if (this.index < this.songs.size() - 1) {
+                if (this.currentIndex < this.songs.size() - 1) {
                     // Create player for next song and start playing it
-                    this.index++;
-                    this.player = this.createPlayer(this.songs.get(this.index));
+                    this.currentIndex++;
+                    this.player = this.createPlayer(this.songs.get(this.currentIndex));
                     this.player.play();
                 }
             });
@@ -102,12 +105,12 @@ public class MusicPlayer {
      * @throws ExceededTimeException if the actual time plus the number of seconds
      *                               given exceeds the duration of the song
      */
-    public void advance(double seconds) throws ExceededTimeException {
+    public void advance(double milisecs) throws ExceededTimeException {
         Duration currentTime = this.player.getCurrentTime();
-        Duration newTime = currentTime.add(Duration.seconds(seconds));
+        Duration newTime = currentTime.add(Duration.millis(milisecs));
         if (newTime.greaterThan(this.player.getTotalDuration())) {
             throw new ExceededTimeException(this.getCurrentSong(),
-                    seconds);
+                    milisecs);
         }
         this.player.seek(newTime);
     }
@@ -119,12 +122,12 @@ public class MusicPlayer {
      * @throws BeforeStartException if the actual time minus the number of seconds
      *                              given is less than the initial time of the song
      */
-    public void goBack(double seconds) throws BeforeStartException {
+    public void goBack(double milisecs) throws BeforeStartException {
         Duration currentTime = this.player.getCurrentTime();
-        Duration newTime = currentTime.subtract(Duration.seconds(seconds));
+        Duration newTime = currentTime.subtract(Duration.millis(milisecs));
         if (newTime.lessThan(Duration.ZERO)) {
             throw new BeforeStartException(this.getCurrentSong(),
-                    seconds);
+                    milisecs);
         }
         this.player.seek(newTime);
     }
@@ -136,20 +139,20 @@ public class MusicPlayer {
      * @throws SongNotFoundException if the new song can not be found
      */
     public void nextSong() throws NoMoreSongsException, SongNotFoundException {
-        this.index++;
+        this.currentIndex++;
         String newSong = "";
         try {
-            newSong = this.songs.get(index);
+            newSong = this.songs.get(this.currentIndex);
             this.player.stop();
             this.player.dispose();
             this.player = createPlayer(newSong);
             this.player.play();
         } catch (IndexOutOfBoundsException e1) {
-            this.index--;
+            this.currentIndex--;
             throw new NoMoreSongsException();
         } catch (Exception e2) {
-            this.index--;
-            this.player = createPlayer(songs.get(index));
+            this.currentIndex--;
+            this.player = createPlayer(songs.get(this.currentIndex));
             throw new SongNotFoundException(newSong);
         }
     }
@@ -160,22 +163,95 @@ public class MusicPlayer {
      * @throws SongNotFoundException if the song can not be found
      */
     public void previousSong() throws SongNotFoundException {
-        this.index--;
+        this.currentIndex--;
         String newSong = "";
         try {
-            newSong = this.songs.get(index);
+            newSong = this.songs.get(this.currentIndex);
             this.player.stop();
             this.player.dispose();
             this.player = createPlayer(newSong);
             this.player.play();
         } catch (Exception e) {
-            this.index++;
-            this.player = createPlayer(songs.get(index));
+            this.currentIndex++;
+            this.player = createPlayer(songs.get(this.currentIndex));
             throw new SongNotFoundException(newSong);
         }
     }
 
-    public TimeStamp getPosition(long time) {
+    public Status getStatus() {
+        MediaPlayer.Status playerStatus = this.player.getStatus();
+        int attemps = 5;
+
+        // In case the player is being initialized, we wait until is either playing or
+        // paused
+        while (playerStatus != MediaPlayer.Status.PLAYING || playerStatus == MediaPlayer.Status.PAUSED
+                || attemps < 0) {
+            playerStatus = this.player.getStatus();
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            attemps--;
+        }
+
+        if (attemps < 0) {
+            throw new FatalMPError(playerStatus);
+        }
+
+        return Status.transform(playerStatus);
+    }
+
+    public SongInstant getSongInstantFrom(SongInstant fromSongInstant, long fromTime, long targetTime) {
+        long timeLeft = targetTime - fromTime;
+
+        String song = fromSongInstant.getSong();
+
+        String audioFilePath = getClass().getResource(BASE_URL + song).toExternalForm();
+        Media media = new Media(audioFilePath);
+
+        Duration songDuration = media.getDuration();
+        Duration newDuration = fromSongInstant.getInstant().add(Duration.millis(timeLeft));
+
+        while (newDuration.greaterThan(songDuration)) {
+            int songIndex = this.songs.indexOf(song);
+
+            if (songIndex == -1) {
+                // TODO Throw an exception or something
+                return null;
+            }
+
+            if (songIndex == this.songs.size() - 1) {
+                // TODO What should I return if the party will be over
+                return null;
+            }
+
+            song = this.songs.get(songIndex);
+
+            newDuration = newDuration.subtract(songDuration);
+
+            audioFilePath = getClass().getResource(BASE_URL + song).toExternalForm();
+            media = new Media(audioFilePath);
+
+            songDuration = media.getDuration();
+        }
+
+        return new SongInstant(song, newDuration);
 
     }
+
+    public SongInstant getSongInstantFromNow(long targetTime) {
+        String song = this.songs.get(currentIndex);
+        Duration currentDuration = this.player.getCurrentTime();
+        long currentTime = Instant.now().toEpochMilli();
+        SongInstant currentInstant = new SongInstant(song, currentDuration);
+
+        // If they player is paused, we will remain in the same instant.
+        if (this.getStatus() == Status.PAUSED) {
+            return currentInstant;
+        }
+
+        return this.getSongInstantFrom(currentInstant, currentTime, targetTime);
+    }
+
 }
