@@ -35,6 +35,7 @@ public class Main {
     private List<String> availableSongs;
     private boolean delayedHeartbeat = false;
     private boolean host;
+    private MusicPlayerThread musicPlayerThread;
     int port;
     String ip;
 
@@ -43,32 +44,29 @@ public class Main {
     ZonedDateTime time;
 
     public static void main(String[] args) throws UnknownHostException, IOException {
-        Main instance =new Main();
+        Main instance = new Main();
         instance.run();
     }
 
-    private void run() throws UnknownHostException, IOException{
+    private void run() throws UnknownHostException, IOException {
         Scanner scanner = new Scanner(System.in);
         // implement here part to connect to a party or start a party
 
         // if you are not in a party
         if (!isParty) {
-            //shows options to start or join party
+            // shows options to start or join party
             System.out.println("You are not currently in a party");
             System.out.println("Type 'party' to start a new party or 'join' to join an existing party");
             String input = scanner.nextLine();
-        
+
             if (input.equals("party")) {
-                startParty(scanner); //TODO by Niklas?
-            } 
-            else if (input.equals("join")) {
+                startParty(scanner); // TODO by Niklas?
+            } else if (input.equals("join")) {
                 inviteParty(scanner);
-            }
-            else {
+            } else {
                 System.out.println("Invalid option; please type 'party' or 'join'");
             }
-        } 
-        else {
+        } else {
             // if you are in a party:
             MemberConnection connection = new MemberConnection(partyOrganizer, ip, port);
             System.out.println("You are in a party! You can use either of these commands:"
@@ -81,10 +79,8 @@ public class Main {
             Action matchedAction = Action.match(action);
             if (matchedAction != null) {
                 connection.sendActionRequest(matchedAction);
-            }
-            else if (action.equals("Y") || action.equals("N")){
-            }
-            else{
+            } else if (action.equals("Y") || action.equals("N")) {
+            } else {
                 System.out.print("The action you entered is not one of the available options");
             }
         }
@@ -121,14 +117,14 @@ public class Main {
     }
 
     private void startParty(Scanner scanner) {
-        //TODO by Niklas?
+        // TODO by Niklas?
         isParty = true;
         partyOrganizer = "You";
         System.out.println("You have started a party");
-        List<String> partySongs= askUserSongs(scanner);
-        musicPlayer= new MusicPlayer(partySongs);
+        List<String> partySongs = askUserSongs(scanner);
+        musicPlayer = new MusicPlayer(partySongs);
 
-        //...
+        // ...
     }
 
     /**
@@ -203,18 +199,21 @@ public class Main {
     }
 
     /**
-     * Method that sends the given JSONObject to all the connections that the main has
+     * Method that sends the given JSONObject to all the connections that the main
+     * has
+     * 
      * @param message The object to be sent through the connections
-     * @throws IOException 
+     * @throws IOException
      */
     public void sendToAllConnections(JSONObject message) throws IOException {
-        for(Connection con: listConnections) {
+        for (Connection con : listConnections) {
             con.send(message);
         }
     }
 
     /**
-     * This method will change the variable in main showing that the heartbeat thread has not heard form the host in too long
+     * This method will change the variable in main showing that the heartbeat
+     * thread has not heard form the host in too long
      */
     public void notHeardFromHost() {
         delayedHeartbeat = true;
@@ -226,5 +225,4 @@ public class Main {
         // TODO Auto-generated method stub
     }
 
-    
 }

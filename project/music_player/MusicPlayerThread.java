@@ -7,10 +7,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javafx.application.Platform;
 import party.Action;
 import utils.SongInstant;
 
-public class MusicPlayerThread {
+public class MusicPlayerThread implements Runnable {
 
     private MusicPlayer mp;
     private List<Update> updates = new ArrayList<>();
@@ -19,10 +20,31 @@ public class MusicPlayerThread {
         this.mp = mp;
     }
 
+    /**
+     * Creates an update reflecting the changes occured in the music playerafter
+     * applying an action ata a determined time
+     * 
+     * @param action        action to execute
+     * @param executionTime time at which the action will be executed
+     * @return Update object with the mentioned changes reflected or null if that
+     *         action can not be executed for some reason
+     */
     public Update createUpdate(Action action, long executionTime) {
-        // TODO
+        PlayerStatus prevStatus = getStatus(executionTime);
+        PlayerStatus newStatus = action.apply(this.mp, prevStatus);
+        if (newStatus == null) {
+            return null;
+        }
+        return new Update(newStatus, executionTime);
     }
 
+    /**
+     * Gets the song name and the instant of the song that will be played at a
+     * certain moment
+     * 
+     * @param time moment when the information is to be obtained (ms since Epoch)
+     * @return SongInstant object with the mentioned information
+     */
     public SongInstant getPosition(long time) {
         return getStatus(time).getInstant();
 
@@ -46,7 +68,38 @@ public class MusicPlayerThread {
             return new PlayerStatus(lastInstant, Status.PAUSED);
         }
 
-        return new PlayerStatus(this.mp.getSongInstantFrom(lastInstant, lastUpdate.getExecutionTime(), time), Status.PLAYING);
+        return new PlayerStatus(this.mp.getSongInstantFrom(lastInstant, lastUpdate.getExecutionTime(), time),
+                Status.PLAYING);
+    }
+
+    /**
+     * Schedules a change to be done with the information provided by parameter
+     * 
+     * @param update Update object with contains the necessery information for the
+     *               change
+     */
+    public void addChange(Update update) {
+        this.updates.add(update);
+        long executionTime = update.getExecutionTime();
+        PlayerStatus newStatus = new PlayerStatus(update.geSongInstant(), update.getStatus());
+        // We don't have to do anything if there is no actual update
+        if (this.getStatus(executionTime).equals(newStatus)) {
+            return;
+        }
+
+        // Schedule update
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        long delayInMillis = executionTime - Instant.now().toEpochMilli();
+        // Programa la tarea
+        scheduler.schedule(() -> {
+            this.mp.update(newStatus);
+        }, delayInMillis, TimeUnit.MILLISECONDS);
+
+    }
+
+    @Override
+    public void run() {
+        Platform.startup(() -> this.mp.play());
     }
 
     // Example about how to implement doing an action in a certain UTC time. I

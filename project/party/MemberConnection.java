@@ -6,6 +6,9 @@ import java.net.UnknownHostException;
 import utils.MessageType;
 import org.json.JSONObject;
 
+import main.Main;
+import music_player.Update;
+
 public class MemberConnection extends PartyConnection {
 
     public MemberConnection(String peer, String ip, int port) throws UnknownHostException, IOException {
@@ -22,8 +25,8 @@ public class MemberConnection extends PartyConnection {
 
         try {
             while ((message = socket.receive(MessageType.EXECUTE_ACTION.toString())) != null) {
-                String updateStr = message.getString("update");
-
+                Update update = Update.parsefromJSON(message);
+                Main.getInstance().getMusicPlayerThread().addChange(update);
             }
 
             return;

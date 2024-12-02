@@ -56,10 +56,24 @@ public class Update {
         ret.put("action", status.toString());
         ret.put("action_timestamp", executionTime);
         ret.put("song_name", getSongName());
-        ret.put("song_time", getSongTime());
+        ret.put("song_time", getSongTime().toMillis());
         ret.put("total_updates", num_updates - 1);
 
         return ret;
+    }
+
+    /**
+     * Gets an update from a JSON object
+     * 
+     * @param json JSON object containing the information
+     * @return a new Update object
+     */
+    public static Update parsefromJSON(JSONObject json) {
+        Status st = Status.match(json.getString("action"));
+        long executionTime = json.getLong("action_timestamp");
+        String song = json.getString("song_name");
+        Duration instant = Duration.millis(json.getDouble("song_time"));
+        return new Update(st, executionTime, song, instant);
     }
 
 }

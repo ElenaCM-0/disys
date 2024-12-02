@@ -4,6 +4,7 @@ import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.List;
 
+import javafx.application.Platform;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
@@ -39,6 +40,8 @@ public class MusicPlayer {
                     this.currentIndex++;
                     this.player = this.createPlayer(this.songs.get(this.currentIndex));
                     this.player.play();
+                } else {
+                    Platform.exit();
                 }
             });
         } catch (Exception e) {
@@ -75,7 +78,35 @@ public class MusicPlayer {
     }
 
     /**
-     * +
+     * @param fromSong name of the song of which you want to know the next one
+     * @return name of the next song or null if the current one is the last song
+     */
+    public String getnextSong(String fromSong) {
+        int songIndex = this.songs.indexOf(fromSong);
+
+        if (songIndex == -1 || songIndex == this.songs.size() - 1) {
+            return null;
+        }
+
+        return this.songs.get(songIndex + 1);
+    }
+
+    /**
+     * @param fromSong name of the song of which you want to know the previous one
+     * @return name of the previous song or null if the current one is the first
+     *         song
+     */
+    public String getPreviousSong(String fromSong) {
+        int songIndex = this.songs.indexOf(fromSong);
+
+        if (songIndex == -1 || songIndex == 0) {
+            return null;
+        }
+
+        return this.songs.get(songIndex - 1);
+    }
+
+    /**
      * Adds new song to the list
      * 
      * @param song name of the song
@@ -96,6 +127,27 @@ public class MusicPlayer {
      */
     public void pause() {
         this.player.pause();
+    }
+
+    /**
+     * Updates the status of the music player
+     * 
+     * @param newPlayerStatus status to update to
+     */
+    public void update(PlayerStatus newPlayerStatus) {
+        SongInstant songInstant = newPlayerStatus.getInstant();
+        String song = songInstant.getSong();
+        Duration instant = songInstant.getInstant();
+        int songIndex = this.songs.indexOf(song);
+        Status status = newPlayerStatus.getStatus();
+
+        this.currentIndex = songIndex;
+        this.player.stop();
+        this.player.dispose();
+        this.player = createPlayer(song);
+        this.player.seek(instant);
+        status.set(this);
+        this.currentIndex = songIndex;
     }
 
     /**
@@ -178,13 +230,17 @@ public class MusicPlayer {
         }
     }
 
+    //
+    /**
+     * @return status (playing or paused) of the player
+     */
     public Status getStatus() {
         MediaPlayer.Status playerStatus = this.player.getStatus();
         int attemps = 5;
 
         // In case the player is being initialized, we wait until is either playing or
         // paused
-        while (playerStatus != MediaPlayer.Status.PLAYING || playerStatus == MediaPlayer.Status.PAUSED
+        while (playerStatus != MediaPlayer.Status.PLAYING && playerStatus != MediaPlayer.Status.PAUSED
                 || attemps < 0) {
             playerStatus = this.player.getStatus();
             try {
@@ -202,6 +258,15 @@ public class MusicPlayer {
         return Status.transform(playerStatus);
     }
 
+    /**
+     * Returns the song and the instant that will be played at a certain moment
+     * assuming no changes since a certain moment
+     * 
+     * @param fromSongInstant song and instant originally being played
+     * @param fromTime        time when fromSongInstant is being played
+     * @param targetTime      time we want to know information about
+     * @return SongInstant object containing the mentioned information
+     */
     public SongInstant getSongInstantFrom(SongInstant fromSongInstant, long fromTime, long targetTime) {
         long timeLeft = targetTime - fromTime;
 
@@ -226,6 +291,8 @@ public class MusicPlayer {
                 return null;
             }
 
+            songIndex++;
+
             song = this.songs.get(songIndex);
 
             newDuration = newDuration.subtract(songDuration);
@@ -240,6 +307,13 @@ public class MusicPlayer {
 
     }
 
+    /**
+     * Returns the song and the instant that will be played at a certain moment
+     * assuming no changes since now
+     * 
+     * @param targetTime time we want to know information about
+     * @return SongInstant object containing the mentioned information
+     */
     public SongInstant getSongInstantFromNow(long targetTime) {
         String song = this.songs.get(currentIndex);
         Duration currentDuration = this.player.getCurrentTime();

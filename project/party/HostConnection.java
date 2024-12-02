@@ -10,9 +10,10 @@ import main.Main;
 import music_player.MusicPlayerThread;
 import music_player.Update;
 import party.heartbeat.Heartbeat;
+import utils.MessageType;
 import utils.MySocket;
 
-public class HostConnection extends PartyConnection{
+public class HostConnection extends PartyConnection {
 
     public HostConnection(String peer, MySocket socket) throws UnknownHostException, IOException {
         super(peer, socket);
@@ -24,7 +25,7 @@ public class HostConnection extends PartyConnection{
         Action action;
 
         try {
-            while((message = socket.receive("action_request")) != null){
+            while ((message = socket.receive("action_request")) != null) {
                 action = Action.match(message.getString("command"));
 
                 if (action == null) {
@@ -39,7 +40,7 @@ public class HostConnection extends PartyConnection{
         } catch (IOException e) {
             e.printStackTrace();
 
-            return; 
+            return;
         }
     }
 
@@ -49,9 +50,9 @@ public class HostConnection extends PartyConnection{
         long time = main.getNearestChange();
 
         Update update = main.getMusicPlayerThread().createUpdate(act, time);
-        
+
         main.getHeartbeat().lastUpdate(time);
-        
+
         sendUpdateToMembers(update, main);
 
         main.addAction(update);
@@ -60,7 +61,7 @@ public class HostConnection extends PartyConnection{
     public static void sendUpdateToMembers(Update update, Main main) {
         JSONObject message = update.createUpdateJSON();
 
-        message.put("type", "action");
+        message.put("type", MessageType.EXECUTE_ACTION.toString());
 
         try {
             main.sendToAllConnections(message);
@@ -70,5 +71,5 @@ public class HostConnection extends PartyConnection{
             return;
         }
     }
-    
+
 }
