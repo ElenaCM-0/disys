@@ -12,9 +12,17 @@ public class Update {
     private static int num_updates = 0;
 
     public Update(Status status, long executionTime, String songName, Duration songTime) {
+        this(new SongInstant(songName, songTime), status, executionTime);
+    }
+
+    public Update(PlayerStatus playerStatus, Long executionTime) {
+        this(playerStatus.getInstant(), playerStatus.getStatus(), executionTime);
+    }
+
+    private Update(SongInstant instant, Status status, Long executionTime) {
         this.status = status;
         this.executionTime = executionTime;
-        this.songInstant = new SongInstant(songName, songTime);
+        this.songInstant = instant;
         num_updates++;
     }
 

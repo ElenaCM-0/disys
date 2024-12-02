@@ -7,9 +7,9 @@ import java.time.Instant;
 import org.json.JSONObject;
 
 import main.Main;
+import music_player.MusicPlayerThread;
 import music_player.Update;
 import party.heartbeat.Heartbeat;
-import test.MusicPlayer;
 import utils.MySocket;
 
 public class HostConnection extends PartyConnection{
@@ -46,13 +46,29 @@ public class HostConnection extends PartyConnection{
     @Override
     public void sendActionRequest(Action act) {
         Main main = Main.getInstance();
-        Long time = main.getNearestChange();
+        long time = main.getNearestChange();
 
-        Update update = MusicPlayer.createUpdate(time, act);
+        Update update = main.getMusicPlayerThread().createUpdate(act, time);
         
         main.getHeartbeat().lastUpdate(time);
         
-        
+        sendUpdateToMembers(update, main);
+
+        main.addAction(update);
+    }
+
+    public static void sendUpdateToMembers(Update update, Main main) {
+        JSONObject message = update.createUpdateJSON();
+
+        message.put("type", "action");
+
+        try {
+            main.sendToAllConnections(message);
+        } catch (IOException e) {
+            e.printStackTrace();
+
+            return;
+        }
     }
     
 }

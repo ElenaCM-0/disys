@@ -4,6 +4,7 @@ import java.time.Instant;
 
 public abstract class Heartbeat implements Runnable {
     protected long latestUpdate;
+    protected boolean repeat = true;
 
     /**
      * This method will update the heartbeat with the lastest contact
@@ -18,7 +19,7 @@ public abstract class Heartbeat implements Runnable {
     @Override
     public void run() {
         try {
-            while (true) {
+            while (repeat) {
                 Thread.sleep(1000 * SLEEP_SEC());
 
                 if (Math.abs(Instant.now().getEpochSecond() - latestUpdate) <= MAX_DISTANCE())
@@ -27,7 +28,6 @@ public abstract class Heartbeat implements Runnable {
                 /* It has been too long since the last update */
 
                 adjustHeartbeat();
-
             }
         } catch (InterruptedException e) {
             return;

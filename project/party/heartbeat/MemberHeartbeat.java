@@ -2,12 +2,17 @@ package party.heartbeat;
 
 import java.time.Instant;
 
+import main.Main;
+
 public class MemberHeartbeat extends Heartbeat {
 
     @Override
     protected void adjustHeartbeat() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'adjustHeartbeat'");
+        Main main = Main.getInstance();
+
+        main.notHeardFromHost();
+
+        repeat = false;
     }
 
     @Override

@@ -25,6 +25,14 @@ public class Connection implements Runnable {
     }
 
     /**
+     * Method that sends the given message through the connection
+    * @throws IOException 
+    */
+    public void send(JSONObject message) throws IOException {
+        socket.send(message);
+    }
+
+    /**
      * When this method is called, a new thread will listen in on the messages sent through this connection,
      * dealing with them as they are received
      */

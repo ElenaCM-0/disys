@@ -7,8 +7,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import javax.swing.Action;
-
+import party.Action;
 import utils.SongInstant;
 
 public class MusicPlayerThread {
@@ -20,24 +19,34 @@ public class MusicPlayerThread {
         this.mp = mp;
     }
 
-    public void createUpdate(Action action, long executionTime) {
-
+    public Update createUpdate(Action action, long executionTime) {
+        // TODO
     }
 
     public SongInstant getPosition(long time) {
+        return getStatus(time).getInstant();
+
+    }
+
+    /**
+     * @param time The moment when this status is to be obtained
+     * @return The status that the player will be in a specified time
+     */
+    public PlayerStatus getStatus(long time) {
 
         if (updates.isEmpty()) {
-            return this.mp.getSongInstantFromNow(time);
+            /** Do we delete past updates? */
+            /** TODO */
+            return new PlayerStatus(this.mp.getSongInstantFromNow(time), Status.PLAYING);
         }
 
         Update lastUpdate = this.updates.getLast();
         SongInstant lastInstant = lastUpdate.geSongInstant();
         if (lastUpdate.getStatus() == Status.PAUSED) {
-            return lastInstant;
+            return new PlayerStatus(lastInstant, Status.PAUSED);
         }
 
-        return this.mp.getSongInstantFrom(lastInstant, lastUpdate.getExecutionTime(), time);
-
+        return new PlayerStatus(this.mp.getSongInstantFrom(lastInstant, lastUpdate.getExecutionTime(), time), Status.PLAYING);
     }
 
     // Example about how to implement doing an action in a certain UTC time. I
