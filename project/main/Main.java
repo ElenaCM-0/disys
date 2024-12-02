@@ -12,9 +12,12 @@ import music_player.MusicPlayer;
 import music_player.MusicPlayerThread;
 import music_player.Update;
 import party.Action;
+import party.MemberConnection;
+import party.PartyConnection;
 import party.heartbeat.Heartbeat;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.time.*;
 import java.time.temporal.*;
 import java.util.ArrayList;
@@ -22,22 +25,29 @@ import java.util.Date;
 import java.util.List;
 
 public class Main {
-    private static boolean isParty = false;
-    private static String partyOrganizer = "";
+    private boolean isParty = false;
+    private String partyOrganizer = "";
     private static Main instance = null;
+    private String user;
     private MusicPlayer musicPlayer;
     private Heartbeat heartbeat;
     private List<Connection> listConnections;
-    private static List<String> availableSongs;
+    private List<String> availableSongs;
     private boolean delayedHeartbeat = false;
-
+    private boolean host;
     int port;
+    String ip;
 
     String song;
 
     ZonedDateTime time;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws UnknownHostException, IOException {
+        Main instance =new Main();
+        instance.run();
+    }
+
+    private void run() throws UnknownHostException, IOException{
         Scanner scanner = new Scanner(System.in);
         // implement here part to connect to a party or start a party
 
@@ -49,7 +59,6 @@ public class Main {
             String input = scanner.nextLine();
         
             if (input.equals("party")) {
-                askUserSongs(scanner);
                 startParty(scanner); //TODO by Niklas?
             } 
             else if (input.equals("join")) {
@@ -61,7 +70,7 @@ public class Main {
         } 
         else {
             // if you are in a party:
-            Connection connection = new Connection();
+            MemberConnection connection = new MemberConnection(partyOrganizer, ip, port);
             System.out.println("You are in a party! You can use either of these commands:"
                     + "- play: if you want to play de music"
                     + "- pause: if you want to stop the song"
@@ -74,7 +83,6 @@ public class Main {
                 connection.sendActionRequest(matchedAction);
             }
             else if (action.equals("Y") || action.equals("N")){
-
             }
             else{
                 System.out.print("The action you entered is not one of the available options");
@@ -112,11 +120,14 @@ public class Main {
         return Instant.now().getEpochSecond() + getSeconds();
     }
 
-    private static void startParty(Scanner scanner) {
+    private void startParty(Scanner scanner) {
         //TODO by Niklas?
-        isParty = true
-        partyOrganizer = "You"
+        isParty = true;
+        partyOrganizer = "You";
         System.out.println("You have started a party");
+        List<String> partySongs= askUserSongs(scanner);
+        musicPlayer= new MusicPlayer(partySongs);
+
         //...
     }
 
@@ -161,9 +172,10 @@ public class Main {
             }
         }
         scanner.close();
+        return partySongs;
     }
 
-    private static void inviteParty(Scanner scanner) {
+    private void inviteParty(Scanner scanner) {
         System.out.println(partyOrganizer + "has organized a listening party, do you want to participate? (Y/N)");
         String response = scanner.nextLine();
         if (response.equalsIgnoreCase("Y")) {
