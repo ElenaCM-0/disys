@@ -42,3 +42,37 @@
 - The class is initialized with a list of names of songs (the ones that will be played) and it allows to add new songs.
 - I've assumed the songs are stored in some folder called resources/songs. 
 - My part for this week is contained in the folder music_player. More information about its structure and how to execute it can be found in the README of that folder. 
+
+
+### NN:
+#### SharedInfo class
+(CASE 1 from notes.md):
+
+- When reveiving a request, SharedInfo helps manage the request by storing it in the waitingConnection field
+
+- Host check (if host is true, ignore the request)
+    - I assume that the logic to check whether the host is true is handled outside of SharedInfo 
+
+- If the host is true, the flow should return to waiting for messages (0), skipping the rest of the process
+
+- Otherwise if host is false: acquire lock for asking user (request)
+
+- use the acquireLock() method from SharedInfo to ensure that only one thread can ask for the user’s response at a time, avoiding conditions when multiple threads try to access shared data
+
+- Check if host is true: check the host status in the main logic. If the host is true, the system should return to waiting for messages, and no further action is required for that request
+
+- If host is false: Set myself as the last request in main
+
+- Set answer to be null
+- Before waiting for the user’s response, we call sharedInfo.setAnswer(null) 
+to reset the previous answer
+- This ensures that the state is cleared for the new request
+
+- Ask user and wait for answer to not be null
+- We can check the answer via getAnswer() to determine if it's been set by the user
+
+- When the answer is provided (not null), we process it. If the answer is false, we release the lock and return to the waiting state (0)
+
+- If the answer is true, we continue with the party member process, allowing the user to join or take actions in the party
+
+- Once the shared data is no longer needed, we should release the lock via sharedInfo.releaseLock(), allowing other threads to safely access and modify shared data
