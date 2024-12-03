@@ -1,16 +1,13 @@
 package main;
 
-import java.util.Scanner;
-
 import utils.Connection;
 import utils.MySocket;
-import java.util.concurrent.*;
-
-import org.json.JSONObject;
+import utils.SharedInfo;
 
 import music_player.MusicPlayer;
 import music_player.MusicPlayerThread;
 import music_player.Update;
+
 import party.Action;
 import party.MemberConnection;
 import party.PartyConnection;
@@ -20,9 +17,16 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.time.*;
 import java.time.temporal.*;
+
+import org.json.JSONObject;
+
+import java.util.Scanner;
+import java.util.concurrent.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+
 
 public class Main {
     private boolean isParty = false;
@@ -49,6 +53,7 @@ public class Main {
     }
 
     private void run() throws UnknownHostException, IOException {
+        SharedInfo sharedInfo = new SharedInfo();
         Scanner scanner = new Scanner(System.in);
         // implement here part to connect to a party or start a party
 
@@ -59,13 +64,21 @@ public class Main {
             System.out.println("Type 'party' to start a new party or 'join' to join an existing party");
             String input = scanner.nextLine();
 
-            if (input.equals("party")) {
-                startParty(scanner); // TODO by Niklas?
-            } else if (input.equals("join")) {
-                inviteParty(scanner);
-            } else {
-                System.out.println("Invalid option; please type 'party' or 'join'");
+            sharedInfo.acquireLock(); //acquire lock to safely modify shared info
+            try{
+                if (input.equals("party")) {
+                    startParty(scanner, sharedInfo); // TODO by Niklas?
+                
+                } else if (input.equals("join")) {
+                    inviteParty(scanner);
+                
+                } else {
+                    System.out.println("Invalid option; please type 'party' or 'join'");
+                }
+            } finally {
+                sharedInfo.releaseLock(); // release lock after processing
             }
+
         } else {
             // if you are in a party:
             MemberConnection connection = new MemberConnection(partyOrganizer, ip, port);
@@ -124,7 +137,14 @@ public class Main {
         List<String> partySongs = askUserSongs(scanner);
         musicPlayer = new MusicPlayer(partySongs);
 
-        // ...
+        //not really sure where to put this part but it can be here for now
+        sharedInfo.acquireLock();
+        try {
+            sharedInfo.setAnswer("Party started successfully!"); // an example of setting an answer
+            sharedInfo.setWaitingConnection(null); // clears any waiting connections
+        } finally {
+            sharedInfo.releaseLock(); // release the lock
+        }
     }
 
     /**
