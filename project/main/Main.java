@@ -137,7 +137,7 @@ public class Main {
         List<String> partySongs = askUserSongs(scanner);
         musicPlayer = new MusicPlayer(partySongs);
 
-        //not really sure where to put this part but it can be here for now
+        //not really sure if this is how SharedInfo could be used
         sharedInfo.acquireLock();
         try {
             sharedInfo.setAnswer("Party started successfully!"); // an example of setting an answer
