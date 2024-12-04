@@ -2,7 +2,7 @@ package utils;
 
 public enum MessageType {
     ACTION_REQUEST("action_request"),
-    EXECUTE_ACTION("execute action");
+    EXECUTE_ACTION("action");
 
     private String type;
 

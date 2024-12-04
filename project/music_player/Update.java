@@ -9,6 +9,7 @@ public class Update {
     private Status status;
     private long executionTime;
     private SongInstant songInstant;
+    private int id;
     private static int num_updates = 0;
 
     public Update(Status status, long executionTime, String songName, Duration songTime) {
@@ -23,6 +24,7 @@ public class Update {
         this.status = status;
         this.executionTime = executionTime;
         this.songInstant = instant;
+        id = num_updates;
         num_updates++;
     }
 
@@ -57,7 +59,7 @@ public class Update {
         ret.put("action_timestamp", executionTime);
         ret.put("song_name", getSongName());
         ret.put("song_time", getSongTime().toMillis());
-        ret.put("total_updates", num_updates - 1);
+        ret.put("total_updates", id - 1);
 
         return ret;
     }

@@ -205,3 +205,13 @@ Whoever gets the lock:
 - Same person to do the main adds change to player and player adds change
 
 ####
+
+- Playing party menu heartbeat problems part (Elena)
+- Update list order
+
+#### SCHEDULE
+
+**Friday**
+- Node discovery (Elena R)
+- non playing party menu finish (Consuelo)
+- playing party menu finish (Elena C)
