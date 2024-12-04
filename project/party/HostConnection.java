@@ -55,7 +55,7 @@ public class HostConnection extends PartyConnection {
 
         sendUpdateToMembers(update, main);
 
-        main.addAction(update);
+        main.getMusicPlayerThread().addChange(update);
     }
 
     public static void sendUpdateToMembers(Update update, Main main) {

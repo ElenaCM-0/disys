@@ -1,6 +1,7 @@
 package main;
 
 import utils.Connection;
+import utils.MessageType;
 import utils.MySocket;
 import utils.SharedInfo;
 
@@ -29,36 +30,42 @@ import java.util.List;
 
 
 public class Main {
-    private boolean isParty = false;
-    private String partyOrganizer = "";
     private static Main instance = null;
-    private String user;
-    private MusicPlayer musicPlayer;
     private Heartbeat heartbeat;
     private List<Connection> listConnections;
     private List<String> availableSongs;
     private boolean delayedHeartbeat = false;
     private boolean host;
     private MusicPlayerThread musicPlayerThread;
-    int port;
-    String ip;
+    private Scanner scanner = new Scanner(System.in);
+    private PartyConnection partyConnection; /* If you are the host, this will be a hostConnection, however, if you are a playing party member, this will be the connection that connects you to the host*/
 
-    String song;
+    private SharedInfo partyRequests = new SharedInfo();
+    private SharedInfo partyAnswers = new SharedInfo();
 
-    ZonedDateTime time;
+    public static Main getInstance() {
+        if (instance == null)
+            instance = new Main();
 
-    public static void main(String[] args) throws UnknownHostException, IOException {
-        Main instance = new Main();
-        instance.run();
+        return instance;
     }
 
-    private void run() throws UnknownHostException, IOException {
-        SharedInfo sharedInfo = new SharedInfo();
-        Scanner scanner = new Scanner(System.in);
-        // implement here part to connect to a party or start a party
+    /*******************************************************************************************
+     *                                       USER INTERACTION
+     *******************************************************************************************/
+    public static void main(String[] args) throws UnknownHostException, IOException {
+        Main main = new Main();
 
-        // if you are not in a party
-        if (!isParty) {
+        // implement here part to connect to a party or start a party
+        main.p2pmenu();
+
+        // Here disconnect form network part
+    }
+
+    private void p2pmenu() throws UnknownHostException, IOException {
+        Boolean exit = false;
+
+        while (!exit) {
             // shows options to start or join party
             System.out.println("You are not currently in a party");
             System.out.println("Type 'party' to start a new party or 'join' to join an existing party");
@@ -81,69 +88,98 @@ public class Main {
 
         } else {
             // if you are in a party:
-            MemberConnection connection = new MemberConnection(partyOrganizer, ip, port);
-            System.out.println("You are in a party! You can use either of these commands:"
-                    + "- play: if you want to play de music"
-                    + "- pause: if you want to stop the song"
-                    + "- forward: if you want to skip to the next song"
-                    + "- backward: if you want to go back to the previous song"
-                    + "Note: if your request is not posible to execute (f.e you skip and it is the last song), your request will be ignored");
-            String action = scanner.nextLine();
-            Action matchedAction = Action.match(action);
-            if (matchedAction != null) {
-                connection.sendActionRequest(matchedAction);
-            } else if (action.equals("Y") || action.equals("N")) {
-            } else {
-                System.out.print("The action you entered is not one of the available options");
-            }
+            partyConnection = new MemberConnection(partyOrganizer, ip, port);
+            playingPartyMenu();
         }
     }
 
-    public static Main getInstance() {
-        if (instance == null)
-            instance = new Main();
-
-        return instance;
-    }
-
     /**
-     * This method will return the amount of seconds ahead of the current time an
-     * action
-     * has to be for it to have time to reach all of the nodes and for the nodes to
-     * have
-     * time to take all of the actions
-     * 
-     * @return
+     * This method will do all the necessary preparations for a user to create a playing party
+     * it should be called if the user selects "party" in the p2pmenu
      */
-    private int getSeconds() {
-        /** TODO **/
-    }
+    private void startParty() {
+        System.out.println("Starting party...");
 
-    /**
-     * This method will return the timestamp when the nearest change can be
-     * implemented
-     * 
-     * @return the timestamp when the nearest change can be implemented
-     */
-    public long getNearestChange() {
-        return Instant.now().getEpochSecond() + getSeconds();
-    }
+        System.out.println("First, you must select the songs you would like to play in the playing party");
+        List<String> partySongs = askUserSongs();
 
-    private void startParty(Scanner scanner) {
-        // TODO by Niklas?
-        isParty = true;
-        partyOrganizer = "You";
-        System.out.println("You have started a party");
-        List<String> partySongs = askUserSongs(scanner);
-        musicPlayer = new MusicPlayer(partySongs);
+        /* Send the request to the other nodes */
 
-        //not really sure if this is how SharedInfo could be used
-        sharedInfo.acquireLock();
+        JSONObject request = new JSONObject();
+
+        request.put("type", MessageType.PARTY_REQUEST);
+
         try {
-            sharedInfo.setAnswer("Party started successfully!"); // an example of setting an answer
-            sharedInfo.setWaitingConnection(null); // clears any waiting connections
-        } finally {
-            sharedInfo.releaseLock(); // release the lock
+            sendToAllConnections(request);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        
+        
+    }
+
+    /**
+     * This method will be called when the node is in a playing party, it will print out the options that the user has and it will process the user's input.
+     * This methdo will handle the situation where the user is disconnected from the host
+     */
+    private void playingPartyMenu() {
+        String action;
+
+        while (true) {
+            System.out.println("You are in a party! You can use either of these commands:"
+                + "- play: if you want to play the music"
+                + "- pause: if you want to stop the song"
+                + "- forward: if you want to skip to the next song"
+                + "- backward: if you want to go back to the previous song"
+                + "- exit: if you want to disconnect from the playing party"
+                + "Note: if your request is not posible to execute (f.e you skip and it is the last song), your request will be ignored");
+
+            action = scanner.nextLine();
+            
+            if (delayedHeartbeat) {
+                if (!receiveYN(action)) return;
+
+                continue;
+            }
+            Action matchedAction = Action.match(action);
+
+            if (matchedAction == null) {
+                if (action.equalsIgnoreCase("Exit")) return;
+
+                System.out.print("The action you entered is not one of the available options");
+                continue;
+            }
+
+            try {
+                partyConnection.sendActionRequest(matchedAction);
+            } catch (IOException e) {
+                System.out.println("You action cannot be executed");
+                continue;
+            }
+        }
+        
+    }
+
+    /**
+     * This method will process the user input, only accepting answers that can be interpreted as yes or no
+     * If the user's answer is not within the options, this method will ask again
+     * @param answer The current answer the user has given
+     * @return true if the user said 'Yes', false if the user said 'No'
+     */
+    private boolean receiveYN(String answer) {
+        while (true) {
+            switch (answer) {
+                case "Y" : case "Yes" : case "y": case "yes":
+                    return true;
+                case "N": case "No": case "n": case "no":
+                    return false;
+            }
+
+            System.out.println("Error, please write \'yes\' or \'no\'");
+
+            answer = scanner.nextLine();
         }
     }
 
@@ -163,7 +199,7 @@ public class Main {
      * @return A list of strings representing the songs selected by the user for the
      *         party playlist.
      */
-    public List<String> askUserSongs(Scanner scanner) {
+    public List<String> askUserSongs() {
         List<String> partySongs = new ArrayList<>();
         System.out.println("These are the available songs: ");
         for (String song : availableSongs) {
@@ -191,31 +227,19 @@ public class Main {
         return partySongs;
     }
 
-    private void inviteParty(Scanner scanner) {
-        System.out.println(partyOrganizer + "has organized a listening party, do you want to participate? (Y/N)");
-        String response = scanner.nextLine();
-        if (response.equalsIgnoreCase("Y")) {
-            ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
-            if (time.isBefore(now)) {
-                System.out.print("Sorry, the party started without you!");
-                break;
-            }
-            MySocket socket = new MySocket(partyOrganizer, port);
-            long time_dif = Duration.between(now, time).toMillis();
-            ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-            scheduler.schedule(() -> {
-                createPlayer(song);
-            }, time_dif, TimeUnit.MILLISECONDS);
-        }
+    
+    /*******************************************************************************************
+     *                                     Connection-related
+     *******************************************************************************************/
 
-    }
+    /**
+     * This method will change the variable in main showing that the heartbeat
+     * thread has not heard form the host in too long
+     */
+    public void notHeardFromHost() {
+        delayedHeartbeat = true;
 
-    public MusicPlayerThread getMusicPlayerThread() {
-        return musicPlayerThread;
-    }
-
-    public Heartbeat getHeartbeat() {
-        return heartbeat;
+        System.out.println("Disconnected from the host, continue playing party? (Y/N)");
     }
 
     /**
@@ -232,17 +256,34 @@ public class Main {
     }
 
     /**
-     * This method will change the variable in main showing that the heartbeat
-     * thread has not heard form the host in too long
+     * @return the amount of seconds ahead of the current time an action has to be
+     * for it to have time to reach all of the nodes and for the nodes to have time to take all of 
+     * the actions
      */
-    public void notHeardFromHost() {
-        delayedHeartbeat = true;
-
-        System.out.println("Disconnected from the host, continue playing party?");
+    private int getMilisec() {
+        /** TODO **/
     }
 
-    public void addAction(Update update) {
-        // TODO Auto-generated method stub
+    /**
+     * This method will return the timestamp when the nearest change can be
+     * implemented
+     * 
+     * @return the timestamp when the nearest change can be implemented
+     */
+    public long getNearestChange() {
+        return Instant.now().getEpochSecond() + getMilisec();
+    }
+
+    /*******************************************************************************************
+     *                                    getters/setters
+     *******************************************************************************************/
+
+    public MusicPlayerThread getMusicPlayerThread() {
+        return musicPlayerThread;
+    }
+
+    public Heartbeat getHeartbeat() {
+        return heartbeat;
     }
 
 }

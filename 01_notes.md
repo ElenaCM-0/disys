@@ -213,5 +213,5 @@ Whoever gets the lock:
 
 **Friday**
 - Node discovery (Elena R)
-- non playing party menu finish (Consuelo)
+- non playing party menu finish (now called p2pmenu) (Consuelo)
 - playing party menu finish (Elena C)

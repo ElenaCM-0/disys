@@ -2,7 +2,9 @@ package utils;
 
 public enum MessageType {
     ACTION_REQUEST("action_request"),
+    PARTY_REQUEST("party_request")
     EXECUTE_ACTION("action");
+
 
     private String type;
 
