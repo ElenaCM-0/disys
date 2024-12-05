@@ -240,7 +240,6 @@ public class Main {
                 System.out.println(input + " is not an available song.");
             }
         }
-        scanner.close();
         return partySongs;
     }
 
