@@ -24,23 +24,8 @@ public class P2PConnection extends Connection {
         try {
             while (!Thread.interrupted()) {
                 // receive message and determine its type
-                JSONObject message = socket.receive();
-                if (message != null) {
-                    MessageType messageType = MessageType.valueOf(message.getString("type").toUpperCase());
-
-                    // handle the message based on its type
-                    switch (messageType) {
-                        case ACTION_REQUEST:
-                            processActionRequest(message);
-                            break;
-                        case EXECUTE_ACTION:
-                            processExecuteAction(message);
-                            break;
-                        default:
-                            System.out.println("Unsupported message type: " + messageType);
-                            break;
-                    }
-                }
+                JSONObject message = socket.receive(MessageType.PARTY_REQUEST.name());
+                
             }
         } catch (IOException e) {
             e.printStackTrace();

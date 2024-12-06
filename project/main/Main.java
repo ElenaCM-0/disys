@@ -102,8 +102,16 @@ public class Main {
         System.out.println("Joined network successfully");
     }
 
+    private void startP2PConnections() {
+        for (Map.Entry<P2PConnection, Thread> entry: connectionThreads.entrySet()) {
+            if (entry.getValue() != null)    continue;
+
+            connectionThreads.put(entry.getKey(), new Thread(entry.getKey()));
+        }
+    }
+
     private void p2pmenu() throws UnknownHostException, IOException {
-        
+        startP2PConnections();
 
         Boolean exit = false;
 
