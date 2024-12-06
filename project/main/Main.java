@@ -1,6 +1,5 @@
 package main;
 
-import utils.Connection;
 import utils.MessageType;
 import utils.MySocket;
 import utils.SharedInfo;
@@ -14,7 +13,6 @@ import party.heartbeat.Heartbeat;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
-import java.net.Socket;
 import java.net.UnknownHostException;
 import java.time.*;
 import org.json.JSONObject;
@@ -28,7 +26,6 @@ import java.util.Map;
 public class Main {
     private static Main instance = null;
     private Heartbeat heartbeat;
-    private List<Connection> listConnections;
     private List<String> availableSongs;
     private boolean delayedHeartbeat = false;
     private boolean host;
@@ -42,7 +39,7 @@ public class Main {
 
     private SharedInfo partyRequests = new SharedInfo();
     private SharedInfo partyAnswers = new SharedInfo();
-    private Map<Connection, Thread> connectionThreads = new HashMap<>();
+    private Map<P2PConnection, Thread> connectionThreads = new HashMap<>();
     private static final int PORT = 1234;
 
     public static Main getInstance() {
@@ -68,8 +65,8 @@ public class Main {
 
     private void joinNetwork() throws UnknownHostException, IOException {
         // configuration of the net:
-        InetAddress localHost = InetAddress.getLocalHost();
-        System.out.println("Your IP address is: " + localHost + " Share it with one of the nodes."); // how do we control
+        String myIP = InetAddress.getLocalHost().getHostAddress();
+        System.out.println("Your IP address is: " + myIP + " Share it with one of the nodes."); // how do we control
                                                                                                    // which one?
         System.out.println("Write the IP address of the node next to you: ");
         String ipNeighbour = scanner.nextLine();
@@ -82,7 +79,7 @@ public class Main {
 
         P2PConnection nbConnection = new P2PConnection(userNeighbour, ipNeighbour, PORT);
 
-        listConnections.add(nbConnection);
+        connectionThreads.put(nbConnection, null);
 
         /* Accept in the server socket */
         MySocket connectedSocket = new MySocket(serverSocket.accept());
@@ -100,7 +97,7 @@ public class Main {
         /* Receive the neighbour's name */
         message = connectedSocket.receive();
 
-        listConnections.add(new P2PConnection(message.getString("user"), connectedSocket));
+        connectionThreads.put(new P2PConnection(message.getString("user"), connectedSocket), null);
 
         System.out.println("Joined network successfully");
     }
@@ -317,10 +314,11 @@ public class Main {
      * @throws IOException
      */
     public void sendToAllConnections(JSONObject message) throws IOException {
-        for (Connection con : listConnections) {
+        for (P2PConnection con : connectionThreads.keySet()) {
             con.send(message);
         }
     }
+    
 
     /**
      * @return the amount of seconds ahead of the current time an action has to be
