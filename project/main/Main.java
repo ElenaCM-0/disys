@@ -5,11 +5,16 @@ import utils.MessageType;
 import utils.SharedInfo;
 
 import music_player.MusicPlayerThread;
+import music_player.Update;
+import p2p.P2PConnection;
 import party.Action;
 import party.PartyConnection;
 import party.heartbeat.Heartbeat;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.UnknownHostException;
 import java.time.*;
 import org.json.JSONObject;
@@ -59,6 +64,22 @@ public class Main {
     }
 
     private void p2pmenu() throws UnknownHostException, IOException {
+        // configuration of the net:
+        InetAddress localHost = InetAddress.getLocalHost();
+        System.out.print("Your IP address is: " + localHost + " Share it with one of the nodes."); // how do we control
+                                                                                                   // which one?
+        System.out.print("Write the IP address of the node next to you: ");
+        String ipNeighbour = scanner.nextLine();
+        ServerSocket serverSocket = new ServerSocket(1234);
+        Socket socket1 = new Socket(ipNeighbour, 1234); // connect to the serversocket a peer has opened
+        MySocket mysocket1 = new MySocket(socket1);
+        P2PConnection con1 = new P2PConnection(ipNeighbour, mysocket1); // should ask name of the user?
+        Socket socket2 = serverSocket.accept(); // accept the peer who is trying to connect
+        MySocket mysocket2 = new MySocket(socket2);
+        P2PConnection con2 = new P2PConnection(socket2.getInetAddress().getHostAddress(), mysocket2);
+        con1.run();
+        con2.run();
+
         Boolean exit = false;
 
         while (!exit) {
@@ -243,7 +264,6 @@ public class Main {
                 System.out.println(input + " is not an available song.");
             }
         }
-        scanner.close();
         return partySongs;
     }
 
