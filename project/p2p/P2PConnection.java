@@ -15,6 +15,10 @@ public class P2PConnection extends Connection {
         super(peer, socket);
     }
 
+    public P2PConnection(String peer, String ip, int port) throws UnknownHostException, IOException {
+        super(peer, ip, port);
+    }
+
     @Override
     public void run() {
         try {

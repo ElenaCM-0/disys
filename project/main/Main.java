@@ -6,8 +6,6 @@ import utils.MySocket;
 import utils.SharedInfo;
 
 import music_player.MusicPlayerThread;
-import music_player.Update;
-import netscape.javascript.JSObject;
 import p2p.P2PConnection;
 import party.Action;
 import party.PartyConnection;
@@ -66,25 +64,47 @@ public class Main {
         // Here disconnect form network part
     }
 
-    private void p2pmenu() throws UnknownHostException, IOException {
+    private void joinNetwork() throws UnknownHostException, IOException {
         // configuration of the net:
         InetAddress localHost = InetAddress.getLocalHost();
-        System.out.print("Your IP address is: " + localHost + " Share it with one of the nodes."); // how do we control
+        System.out.println("Your IP address is: " + localHost + " Share it with one of the nodes."); // how do we control
                                                                                                    // which one?
-        System.out.print("Write the IP address of the node next to you: ");
+        System.out.println("Write the IP address of the node next to you: ");
         String ipNeighbour = scanner.nextLine();
-        System.out.print("Write the user name of the node next to you: ");
+        System.out.println("Write the user name of the node next to you: ");
         String userNeighbour = scanner.nextLine();
+
         ServerSocket serverSocket = new ServerSocket(PORT);
-        MySocket mysocket1 = new MySocket(ipNeighbour, PORT);
-        P2PConnection con1 = new P2PConnection(userNeighbour, mysocket1);
-        Socket socket2 = serverSocket.accept(); // accept the peer who is trying to connect
-        MySocket mysocket2 = new MySocket(socket2);
-        JSONObject userNeighbourJson = mysocket2.receive();
-        String userNeighbour2=userNeighbourJson.getString("user");
-        P2PConnection con2 = new P2PConnection(userNeighbour2, mysocket2);
-        con1.run();
-        con2.run();
+        System.out.println("Server socket created, press ENTER to move to the next step");
+        scanner.nextLine();
+
+        P2PConnection nbConnection = new P2PConnection(userNeighbour, ipNeighbour, PORT);
+
+        listConnections.add(nbConnection);
+
+        /* Accept in the server socket */
+        MySocket connectedSocket = new MySocket(serverSocket.accept());
+
+        JSONObject message = new JSONObject();
+
+        /* Send the node's name to the neighbour */
+        System.out.println("Write the user name to send to your neighbour: ");
+        userNeighbour = scanner.nextLine(); 
+        
+        message.put("user", userNeighbour);
+
+        nbConnection.send(message);
+
+        /* Receive the neighbour's name */
+        message = connectedSocket.receive();
+
+        listConnections.add(new P2PConnection(message.getString("user"), connectedSocket));
+
+        System.out.println("Joined network successfully");
+    }
+
+    private void p2pmenu() throws UnknownHostException, IOException {
+        
 
         Boolean exit = false;
 
@@ -308,6 +328,7 @@ public class Main {
      */
     private int getMilisec() {
         /** TODO **/
+        return 0;
     }
 
     /**
