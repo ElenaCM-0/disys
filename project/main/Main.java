@@ -80,7 +80,7 @@ public class Main {
         P2PConnection con1 = new P2PConnection(userNeighbour, mysocket1);
         Socket socket2 = serverSocket.accept(); // accept the peer who is trying to connect
         MySocket mysocket2 = new MySocket(socket2);
-        JSONbject userNeighbourJson=mysocket2.receive();
+        JSONObject userNeighbourJson = mysocket2.receive();
         String userNeighbour2=userNeighbourJson.getString("user");
         P2PConnection con2 = new P2PConnection(userNeighbour2, mysocket2);
         con1.run();
