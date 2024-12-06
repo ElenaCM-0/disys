@@ -9,6 +9,7 @@ import p2p.P2PConnection;
 import party.Action;
 import party.PartyConnection;
 import party.heartbeat.Heartbeat;
+import party.MemberConnection;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -146,6 +147,12 @@ public class Main {
          * -Create a music player and a music player thread and execute
          * -Create heartbeat thread
          */
+        for (Map.Entry<P2PConnection, Thread> entry : connectionThreads.entrySet()) {
+            Thread thread = entry.getValue();
+            if (thread.isAlive()) {
+            thread.interrupt();
+        }
+        }
     }
 
     /**
