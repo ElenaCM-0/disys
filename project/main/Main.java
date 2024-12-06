@@ -2,32 +2,23 @@ package main;
 
 import utils.Connection;
 import utils.MessageType;
-import utils.MySocket;
 import utils.SharedInfo;
 
-import music_player.MusicPlayer;
 import music_player.MusicPlayerThread;
-import music_player.Update;
-
 import party.Action;
-import party.MemberConnection;
 import party.PartyConnection;
 import party.heartbeat.Heartbeat;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.time.*;
-import java.time.temporal.*;
-
 import org.json.JSONObject;
 
 import java.util.Scanner;
-import java.util.concurrent.*;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-
-
+import java.util.Map;
 
 public class Main {
     private static Main instance = null;
@@ -38,10 +29,15 @@ public class Main {
     private boolean host;
     private MusicPlayerThread musicPlayerThread;
     private Scanner scanner = new Scanner(System.in);
-    private PartyConnection partyConnection; /* If you are the host, this will be a hostConnection, however, if you are a playing party member, this will be the connection that connects you to the host*/
+    private PartyConnection partyConnection; /*
+                                              * If you are the host, this will be a hostConnection, however, if you are
+                                              * a playing party member, this will be the connection that connects you to
+                                              * the host
+                                              */
 
     private SharedInfo partyRequests = new SharedInfo();
     private SharedInfo partyAnswers = new SharedInfo();
+    private Map<Connection, Thread> connectionThreads = new HashMap<>();
 
     public static Main getInstance() {
         if (instance == null)
@@ -51,7 +47,7 @@ public class Main {
     }
 
     /*******************************************************************************************
-     *                                       USER INTERACTION
+     * USER INTERACTION
      *******************************************************************************************/
     public static void main(String[] args) throws UnknownHostException, IOException {
         Main main = new Main();
@@ -68,33 +64,47 @@ public class Main {
         while (!exit) {
             // shows options to start or join party
             System.out.println("You are not currently in a party");
-            System.out.println("Type 'party' to start a new party or 'join' to join an existing party");
+            System.out.println("Type 'party' to start a new party or wait for an invitation to join an existing party");
             String input = scanner.nextLine();
 
-            sharedInfo.acquireLock(); //acquire lock to safely modify shared info
-            try{
-                if (input.equals("party")) {
-                    startParty(scanner, sharedInfo); // TODO by Niklas?
-                
-                } else if (input.equals("join")) {
-                    inviteParty(scanner);
-                
-                } else {
-                    System.out.println("Invalid option; please type 'party' or 'join'");
+            if (this.partyAnswers.getWaitingConnection() != null) {
+                boolean yes = receiveYN(input);
+                partyAnswers.setWaitingConnection(null);
+                partyAnswers.setAnswer(yes);
+                if (yes) {
+                    joinParty();
+                    // Connection waitingConnection = partyAnswers.getWaitingConnection();
+                    // for (Connection c : this.connectionThreads.keySet()) {
+                    // if (!c.equals(waitingConnection)) {
+                    // connectionThreads.get(c).interrupt();
+                    // }
+                    // }
+                    // this.partyConnection = new MemberConnection(waitingConnection);
+                    // this.playingPartyMenu();
                 }
-            } finally {
-                sharedInfo.releaseLock(); // release lock after processing
+
+            } else if (input.equals("party")) {
+                startParty();
+            } else {
+                System.out.println("Invalid command \"" + input + "\"");
             }
 
-        } else {
-            // if you are in a party:
-            partyConnection = new MemberConnection(partyOrganizer, ip, port);
-            playingPartyMenu();
         }
     }
 
+    private void joinParty() {
+        // TODO Do all necessary things to join a party
+        /*
+         * -Close useless connections
+         * -Create a member connection and execute it
+         * -Create a music player and a music player thread and execute
+         * -Create heartbeat thread
+         */
+    }
+
     /**
-     * This method will do all the necessary preparations for a user to create a playing party
+     * This method will do all the necessary preparations for a user to create a
+     * playing party
      * it should be called if the user selects "party" in the p2pmenu
      */
     private void startParty() {
@@ -116,37 +126,39 @@ public class Main {
             e.printStackTrace();
         }
 
-        
-        
     }
 
     /**
-     * This method will be called when the node is in a playing party, it will print out the options that the user has and it will process the user's input.
-     * This methdo will handle the situation where the user is disconnected from the host
+     * This method will be called when the node is in a playing party, it will print
+     * out the options that the user has and it will process the user's input.
+     * This methdo will handle the situation where the user is disconnected from the
+     * host
      */
     private void playingPartyMenu() {
         String action;
 
         while (true) {
             System.out.println("You are in a party! You can use either of these commands:"
-                + "- play: if you want to play the music"
-                + "- pause: if you want to stop the song"
-                + "- forward: if you want to skip to the next song"
-                + "- backward: if you want to go back to the previous song"
-                + "- exit: if you want to disconnect from the playing party"
-                + "Note: if your request is not posible to execute (f.e you skip and it is the last song), your request will be ignored");
+                    + "- play: if you want to play the music"
+                    + "- pause: if you want to stop the song"
+                    + "- forward: if you want to skip to the next song"
+                    + "- backward: if you want to go back to the previous song"
+                    + "- exit: if you want to disconnect from the playing party"
+                    + "Note: if your request is not posible to execute (f.e you skip and it is the last song), your request will be ignored");
 
             action = scanner.nextLine();
-            
+
             if (delayedHeartbeat) {
-                if (!receiveYN(action)) return;
+                if (!receiveYN(action))
+                    return;
 
                 continue;
             }
             Action matchedAction = Action.match(action);
 
             if (matchedAction == null) {
-                if (action.equalsIgnoreCase("Exit")) return;
+                if (action.equalsIgnoreCase("Exit"))
+                    return;
 
                 System.out.print("The action you entered is not one of the available options");
                 continue;
@@ -159,21 +171,29 @@ public class Main {
                 continue;
             }
         }
-        
+
     }
 
     /**
-     * This method will process the user input, only accepting answers that can be interpreted as yes or no
+     * This method will process the user input, only accepting answers that can be
+     * interpreted as yes or no
      * If the user's answer is not within the options, this method will ask again
+     * 
      * @param answer The current answer the user has given
      * @return true if the user said 'Yes', false if the user said 'No'
      */
     private boolean receiveYN(String answer) {
         while (true) {
             switch (answer) {
-                case "Y" : case "Yes" : case "y": case "yes":
+                case "Y":
+                case "Yes":
+                case "y":
+                case "yes":
                     return true;
-                case "N": case "No": case "n": case "no":
+                case "N":
+                case "No":
+                case "n":
+                case "no":
                     return false;
             }
 
@@ -227,9 +247,8 @@ public class Main {
         return partySongs;
     }
 
-    
     /*******************************************************************************************
-     *                                     Connection-related
+     * Connection-related
      *******************************************************************************************/
 
     /**
@@ -257,8 +276,9 @@ public class Main {
 
     /**
      * @return the amount of seconds ahead of the current time an action has to be
-     * for it to have time to reach all of the nodes and for the nodes to have time to take all of 
-     * the actions
+     *         for it to have time to reach all of the nodes and for the nodes to
+     *         have time to take all of
+     *         the actions
      */
     private int getMilisec() {
         /** TODO **/
@@ -275,7 +295,7 @@ public class Main {
     }
 
     /*******************************************************************************************
-     *                                    getters/setters
+     * getters/setters
      *******************************************************************************************/
 
     public MusicPlayerThread getMusicPlayerThread() {

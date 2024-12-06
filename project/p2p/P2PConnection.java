@@ -1,20 +1,18 @@
 package p2p;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
+
 import org.json.JSONObject;
 import main.Main;
-
+import utils.Connection;
 import utils.MessageType;
 import utils.MySocket;
 
+public class P2PConnection extends Connection {
 
-public class P2PConnection extends Thread {
-    private MySocket socket;
-    private String peer;
-
-    public P2PConnection(String peer, MySocket socket) {
-        this.peer = peer;
-        this.socket = socket;
+    public P2PConnection(String peer, MySocket socket) throws UnknownHostException, IOException {
+        super(peer, socket);
     }
 
     @Override
@@ -44,8 +42,6 @@ public class P2PConnection extends Thread {
             e.printStackTrace();
         }
     }
-
-
 
     // handle action request from peer
     private void processActionRequest(JSONObject message) {

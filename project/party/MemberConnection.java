@@ -3,6 +3,8 @@ package party;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+
+import utils.Connection;
 import utils.MessageType;
 import org.json.JSONObject;
 
@@ -17,6 +19,10 @@ public class MemberConnection extends PartyConnection {
 
     public MemberConnection(String peer, Socket sock) throws UnknownHostException, IOException {
         super(peer, sock);
+    }
+
+    public MemberConnection(Connection conn) throws UnknownHostException, IOException {
+        super(conn.getPeer(), conn.getSocket());
     }
 
     @Override

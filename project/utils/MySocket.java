@@ -1,4 +1,5 @@
 package utils;
+
 import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
@@ -12,9 +13,10 @@ public class MySocket {
 
     /**
      * It will create the channels for socket connection
+     * 
      * @param socket An already created socket
      */
-    public MySocket(Socket socket) throws UnknownHostException, IOException{
+    public MySocket(Socket socket) throws UnknownHostException, IOException {
         this.tunnel = socket;
         try {
             out = new OutputStreamWriter(tunnel.getOutputStream(), StandardCharsets.UTF_8);
@@ -28,15 +30,54 @@ public class MySocket {
 
     /**
      * It will create the socket connection
-     * @param ip The ip address the socket will be connected to
+     * 
+     * @param ip   The ip address the socket will be connected to
      * @param port The port the socket will connect to
      */
-    public MySocket(String ip, int port) throws UnknownHostException, IOException{
+    public MySocket(String ip, int port) throws UnknownHostException, IOException {
         this(new Socket(ip, port));
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((tunnel == null) ? 0 : tunnel.hashCode());
+        result = prime * result + ((out == null) ? 0 : out.hashCode());
+        result = prime * result + ((in == null) ? 0 : in.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        MySocket other = (MySocket) obj;
+        if (tunnel == null) {
+            if (other.tunnel != null)
+                return false;
+        } else if (!tunnel.equals(other.tunnel))
+            return false;
+        if (out == null) {
+            if (other.out != null)
+                return false;
+        } else if (!out.equals(other.out))
+            return false;
+        if (in == null) {
+            if (other.in != null)
+                return false;
+        } else if (!in.equals(other.in))
+            return false;
+        return true;
     }
 
     /**
      * Sends a message through the socket
+     * 
      * @param message JSON message that is to be sent
      * @throws IOException
      */
@@ -52,11 +93,11 @@ public class MySocket {
      * @return The JSON object that was received
      * @throws IOException
      */
-    public JSONObject receive() throws IOException{
+    public JSONObject receive() throws IOException {
         String messageStr;
-        
+
         messageStr = in.readLine();
-                
+
         if (messageStr == null) {
 
             return null;
@@ -66,7 +107,8 @@ public class MySocket {
     }
 
     /**
-     * Receives a message of the given type through the socket. It will discard all other messages
+     * Receives a message of the given type through the socket. It will discard all
+     * other messages
      * A call to this is blocking. It will wait until a message is received
      * 
      * @param type The message type that the user expects to receive
@@ -74,17 +116,18 @@ public class MySocket {
      * @return The JSON object that was received
      * @throws IOException
      */
-    public JSONObject receive(String type) throws IOException{
+    public JSONObject receive(String type) throws IOException {
         String messageStr;
-        JSONObject message; 
-        
+        JSONObject message;
+
         while (true) {
             messageStr = in.readLine();
-                    
-            if (messageStr == null) return null;
-    
+
+            if (messageStr == null)
+                return null;
+
             message = new JSONObject(messageStr);
-    
+
             if (message.getString("type").equals(type))
                 return message;
         }
