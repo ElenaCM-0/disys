@@ -9,6 +9,7 @@ import p2p.P2PConnection;
 import party.Action;
 import party.PartyConnection;
 import party.heartbeat.Heartbeat;
+import party.MemberConnection;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -51,8 +52,10 @@ public class Main {
 
     /*******************************************************************************************
      * USER INTERACTION
+     * 
+     * @throws InterruptedException
      *******************************************************************************************/
-    public static void main(String[] args) throws UnknownHostException, IOException {
+    public static void main(String[] args) throws UnknownHostException, IOException, InterruptedException {
         Main main = new Main();
 
         main.joinNetwork();
@@ -63,17 +66,35 @@ public class Main {
         // Here disconnect form network part
     }
 
-    private void joinNetwork() throws UnknownHostException, IOException {
+    private void joinNetwork() throws UnknownHostException, IOException, InterruptedException {
         // configuration of the net:
         String myIP = InetAddress.getLocalHost().getHostAddress();
         System.out.println("Your IP address is: " + myIP + " Share it with one of the nodes."); // how do we control
-                                                                                                   // which one?
+                                                                                                // which one?
         System.out.println("Write the IP address of the node next to you: ");
         String ipNeighbour = scanner.nextLine();
         System.out.println("Write the user name of the node next to you: ");
         String userNeighbour = scanner.nextLine();
 
         ServerSocket serverSocket = new ServerSocket(PORT);
+        Thread thr = new Thread(() -> {
+            try {
+                MySocket connectedSocket = new MySocket(serverSocket.accept());
+                /* Receive the neighbour's name */
+                JSONObject message = connectedSocket.receive();
+                String name = message.getString("user");
+                connectionThreads.put(new P2PConnection(name, connectedSocket), null);
+                System.out.println("You are listening from " + name);
+            } catch (UnknownHostException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+        });
+        thr.start();
         System.out.println("Server socket created, press ENTER to move to the next step");
         scanner.nextLine();
 
@@ -81,24 +102,17 @@ public class Main {
 
         connectionThreads.put(nbConnection, null);
 
-        /* Accept in the server socket */
-        MySocket connectedSocket = new MySocket(serverSocket.accept());
-
         JSONObject message = new JSONObject();
 
         /* Send the node's name to the neighbour */
         System.out.println("Write the user name to send to your neighbour: ");
-        userNeighbour = scanner.nextLine(); 
-        
+        userNeighbour = scanner.nextLine();
+
         message.put("user", userNeighbour);
 
         nbConnection.send(message);
-
-        /* Receive the neighbour's name */
-        message = connectedSocket.receive();
-
-        connectionThreads.put(new P2PConnection(message.getString("user"), connectedSocket), null);
-
+        System.out.println("Name sent to your neighbour");
+        thr.join();
         System.out.println("Joined network successfully");
     }
 
@@ -154,6 +168,12 @@ public class Main {
          * -Create a music player and a music player thread and execute
          * -Create heartbeat thread
          */
+        for (Map.Entry<P2PConnection, Thread> entry : connectionThreads.entrySet()) {
+            Thread thread = entry.getValue();
+            if (thread.isAlive()) {
+            thread.interrupt();
+        }
+        }
     }
 
     /**
@@ -326,7 +346,6 @@ public class Main {
             con.send(message);
         }
     }
-    
 
     /**
      * @return the amount of seconds ahead of the current time an action has to be
