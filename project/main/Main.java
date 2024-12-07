@@ -41,7 +41,7 @@ public class Main {
                                               * a playing party member, this will be the connection that connects you to
                                               * the host
                                               */
-
+    private Thread partyConnectionThread;
     private SharedInfo partyRequests = new SharedInfo();
     private SharedInfo partyAnswers = new SharedInfo();
     private Map<P2PConnection, Thread> connectionThreads = new HashMap<>();
@@ -82,7 +82,7 @@ public class Main {
             conn = e.getKey();
             thr = e.getValue();
             // Not sure if this can happpen but just in case
-            if (thr != null) {
+            if (thr.isAlive()) {
                 thr.interrupt();
                 thr.join();
             }
@@ -217,7 +217,7 @@ public class Main {
         }
     }
 
-    private void joinParty(Connection hostConnection) throws UnknownHostException, IOException {
+    private void joinParty(Connection hostConnection) throws UnknownHostException, IOException, InterruptedException {
         // TODO Do all necessary things to join a party
         /*
          * -Close useless connections
@@ -225,19 +225,26 @@ public class Main {
          * -Create a music player and a music player thread and execute
          * -Create heartbeat thread
          */
-
+        Thread thr;
         for (Connection c : this.connectionThreads.keySet()) {
+
             if (!c.equals(hostConnection)) {
-                connectionThreads.get(c).interrupt();
+                thr = connectionThreads.get(c);
+                thr.interrupt();
+                thr.join();
+
             }
         }
-        this.partyConnection = new MemberConnection(hostConnection);
-        partyConnection.run();
+        partyConnection = new MemberConnection(hostConnection);
+        partyConnectionThread = new Thread(this.partyConnection);
+        partyConnectionThread.start();
 
         musicPlayerThread = new Thread(musicPlayerTask);
-        musicPlayerThread.run();
-        this.heartbeat = new MemberHeartbeat();
-        heartbeat.run();
+        musicPlayerThread.start();
+        heartbeat = new MemberHeartbeat();
+        heartbeatThread = new Thread(heartbeat);
+        heartbeatThread.start();
+        playingPartyMenu();
     }
 
     /**
