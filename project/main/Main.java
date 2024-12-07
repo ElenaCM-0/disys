@@ -194,12 +194,14 @@ public class Main {
 
                 if (yes) {
                     joinParty(conn);
+                    continue;
                 }
 
                 if (input.equalsIgnoreCase("party")) {
                     host = true;
                     startParty();
                     host = false;
+                    continue;
                 }
             }
 
@@ -288,10 +290,6 @@ public class Main {
             e.printStackTrace();
         }
 
-        Boolean receivedResponse = false;
-
-        long startTime = System.currentTimeMillis();
-
         /* Set thread timeout to avoid waiting forever */
         Thread thr = new Thread(() -> {
             try {
@@ -302,19 +300,34 @@ public class Main {
 
             if (!receivedResponse) {
                 System.out.println("The other nodes are not answering, press ENTER to return to the previous menu");
+                timeout = true;
             }
         });
         thr.start();
 
         String input;
 
-        Boolean response;
-
-        while (System.currentTimeMillis() - startTime <= TIMEOUT / 1000) {
+        while (!timeout) {
             input = scanner.nextLine();
 
-            if (partyRequests.getWaitingConnection() != null) {
+            if (partyAnswers.getWaitingConnection() != null) {
+                receivedResponse = true;
 
+                host = false;
+                boolean yes = receiveYN(input);
+
+                partyRequests.setWaitingConnection(null);
+                partyRequests.setAnswer(yes);
+
+                if (yes) {
+                    joinParty(conn);
+                }
+
+                if (input.equalsIgnoreCase("party")) {
+                    host = true;
+                    startParty();
+                    host = false;
+                }
             }
 
         }
@@ -375,8 +388,6 @@ public class Main {
                 continue;
             }
         }
-
-        p2pmenu();
 
     }
 
