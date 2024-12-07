@@ -56,7 +56,7 @@ public class P2PConnection extends Connection {
     private boolean processPartyRequest(JSONObject message) {
         Main main = Main.getInstance();
 
-        if (main.getHost() != true) return false;
+        if (main.getHost() != null && main.getHost()) return false;
 
         SharedInfo request = main.getRequest();
 

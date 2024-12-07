@@ -235,7 +235,7 @@ public class Main {
 
         JSONObject request = new JSONObject();
 
-        request.put("type", MessageType.PARTY_REQUEST);
+        request.put("type", MessageType.PARTY_REQUEST.toString());
         int num_songs = partySongs.size();
         request.put("num_songs", num_songs);
         for (int i = 0; i < num_songs; i++) {
