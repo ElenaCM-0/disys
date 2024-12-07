@@ -151,7 +151,7 @@ public class Main {
             createdThread = new Thread(entry.getKey());
             connectionThreads.put(entry.getKey(), createdThread);
 
-            createdThread.run();
+            createdThread.start();
         }
     }
 
