@@ -8,6 +8,7 @@ import main.Main;
 import utils.Connection;
 import utils.MessageType;
 import utils.MySocket;
+import utils.SharedInfo;
 
 public class P2PConnection extends Connection {
 
@@ -23,47 +24,82 @@ public class P2PConnection extends Connection {
     public void run() {
         try {
             while (!Thread.interrupted()) {
-                // receive message and determine its type
-                JSONObject message = socket.receive(MessageType.PARTY_REQUEST.name());
-                
+                // Receive message
+                JSONObject message = socket.receive();
+
+                MessageType type = MessageType.match(message.getString("type"));
+
+                switch (type) {
+                    case MessageType.PARTY_REQUEST:
+                        if (processPartyRequest()) return;
+                        break;
+                    case MessageType.PARTY_RESPONSE:
+                        if (processPartyResponse()) return;
+
+                        break;
+                    default:
+                        break;
+                }
+
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    // handle action request from peer
-    private void processActionRequest(JSONObject message) {
-        String actionStr = message.getString("command");
-        System.out.println("Processing action request: " + actionStr);
-        // example: process the action (e.g., add change to music player)
-        // here you could add logic to update the music player based on the action
-    }
+    /**
+     * @return true if the thread should finish execution after calling the method, false otherwise
+     */
+    private boolean processPartyRequest() {
+        Main main = Main.getInstance();
 
-    // handle execute action from peer
-    private void processExecuteAction(JSONObject message) {
-        String songName = message.getString("song_name");
-        long songTime = message.getLong("song_time");
-        int totalUpdates = message.getInt("total_updates");
+        if (main.getHost() != true) return false;
 
-        // example: update the music player or log the action
-        System.out.println("Executing action with song: " + songName + ", Time: " + songTime);
-        // here you would apply the action to the music player state
-    }
+        SharedInfo request = main.getRequest();
 
-    // method to send a message to the peer
-    public void sendMessage(JSONObject message) throws IOException {
-        // set the message type for the outgoing message
-        message.put("type", MessageType.EXECUTE_ACTION.toString());
-        socket.send(message);
-    }
+        request.acquireLock();
 
-    // close connection
-    public void closeConnection() {
-        try {
-            socket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (main.getInput()) {
+            while (main.getHost() == null);
+
+            if (main.getHost()) return false;
         }
+        
+        System.out.println(peer + " is hosting a playin party, do you want to join?");
+
+        request.setWaitingConnection(this);
+
+        request.setAnswer(null);
+
+        Boolean answer;
+
+        while ((answer = request.getAnswer()) == null);
+
+        request.setWaitingConnection(null);
+
+        request.releaseLock();
+
+        return answer;
+    }
+
+    /**
+     * @return true if the thread should finish execution after calling the method, false otherwise
+     */
+    private boolean processPartyResponse() {
+        Main main = Main.getInstance();
+
+        if (main.getHost() != true) return false;
+
+        SharedInfo answer = main.getResponse();
+
+        answer.acquireLock();
+
+        answer.setWaitingConnection(this);
+
+        answer.setAnswer(null);
+
+        System.out.println(peer + " wants to join your party, accept?");
+
+        return true;
     }
 }
