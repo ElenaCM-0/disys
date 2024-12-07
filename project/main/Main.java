@@ -143,11 +143,15 @@ public class Main {
     }
 
     private void startP2PConnections() {
+        Thread createdThread;
         for (Map.Entry<P2PConnection, Thread> entry : connectionThreads.entrySet()) {
             if (entry.getValue() != null)
                 continue;
 
-            connectionThreads.put(entry.getKey(), new Thread(entry.getKey()));
+            createdThread = new Thread(entry.getKey());
+            connectionThreads.put(entry.getKey(), createdThread);
+
+            createdThread.run();
         }
     }
 
