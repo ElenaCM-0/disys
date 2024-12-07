@@ -24,7 +24,7 @@ public class P2PConnection extends Connection {
 
     @Override
     public void run() {
-        System.out.println("Waiting for " + peer + "to send a message");
+        System.out.println("Waiting for " + peer + " to send a message");
         try {
             while (!Thread.interrupted()) {
                 // Receive message
@@ -77,8 +77,6 @@ public class P2PConnection extends Connection {
         Boolean answer;
 
         while ((answer = request.getAnswer()) == null);
-
-        request.setWaitingConnection(null);
 
         request.releaseLock();
 

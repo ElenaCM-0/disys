@@ -62,7 +62,7 @@ public class Main {
      * @throws InterruptedException
      *******************************************************************************************/
     public static void main(String[] args) throws UnknownHostException, IOException, InterruptedException {
-        Main main = new Main();
+        Main main = Main.getInstance();
 
         main.joinNetwork();
 
@@ -159,23 +159,26 @@ public class Main {
         startP2PConnections();
 
         Boolean exit = false;
-
-        // shows options to start or join party
-        System.out.println("You are not currently in a party");
-        System.out.println("Type 'party' to start a new party or wait for an invitation to join an existing party");
+        P2PConnection conn;
 
         while (!exit) {
+            // shows options to start or join party
+            System.out.println("You are not currently in a party");
+            System.out.println("Type 'party' to start a new party or wait for an invitation to join an existing party");
+    
             String input = scanner.nextLine();
 
             userInput = true;
 
-            if (partyRequests.getWaitingConnection() != null) {
+            if ((conn = partyRequests.getWaitingConnection()) != null) {
                 host = false;
                 boolean yes = receiveYN(input);
 
+                partyRequests.setWaitingConnection(null);
                 partyRequests.setAnswer(yes);
+
                 if (yes) {
-                    joinParty(partyRequests.getWaitingConnection());
+                    joinParty(conn);
                 }
 
                 if (input.equalsIgnoreCase("party")) {
@@ -245,13 +248,35 @@ public class Main {
         for (int i = 0; i < num_songs; i++) {
             request.put("song_" + i, partySongs.get(i));
         }
+
         try {
             sendToAllConnections(request);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
+        /* Set timeout to avoid waiting forever
+
+        while () {
+            String input = scanner.nextLine();
+
+            userInput = true;
+
+            if (partyAnswers.getWaitingConnection() != null) {
+                host = false;
+                boolean yes = receiveYN(input);
+
+                partyRequests.setAnswer(yes);
+                if (yes) {
+                    joinParty(partyRequests.getWaitingConnection());
+                }
+
+                if (input.equalsIgnoreCase("party")) {
+                    host = true;
+                    startParty();
+                }
+            }
+            */
     }
 
     /**
