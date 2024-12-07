@@ -4,7 +4,7 @@ import utils.MessageType;
 import utils.MySocket;
 import utils.SharedInfo;
 
-import music_player.MusicPlayerThread;
+import music_player.MusicPlayerTask;
 import p2p.P2PConnection;
 import party.Action;
 import party.PartyConnection;
@@ -12,7 +12,9 @@ import party.heartbeat.Heartbeat;
 import party.MemberConnection;
 
 import java.io.IOException;
+import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.UnknownHostException;
 import java.time.*;
@@ -20,17 +22,20 @@ import org.json.JSONObject;
 
 import java.util.Scanner;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class Main {
     private static Main instance = null;
+    private Thread heartbeatThread;
+    private Thread musicPlayerThread;
     private Heartbeat heartbeat;
     private List<String> availableSongs;
     private boolean delayedHeartbeat = false;
     private boolean host;
-    private MusicPlayerThread musicPlayerThread;
+    private MusicPlayerTask musicPlayerTask;
     private Scanner scanner = new Scanner(System.in);
     private PartyConnection partyConnection; /*
                                               * If you are the host, this will be a hostConnection, however, if you are
@@ -64,11 +69,36 @@ public class Main {
         main.p2pmenu();
 
         // Here disconnect form network part
+        main.exitApp();
+    }
+
+    private void exitApp() throws InterruptedException {
+        System.out.println("Exiting app..,");
+
+        for (Thread thr : this.connectionThreads.values()) {
+            // Not sure if this can happpen but just in case
+            if (thr != null) {
+                thr.interrupt();
+                thr.join();
+            }
+        }
+        musicPlayerThread.interrupt();
+        musicPlayerThread.join();
+        heartbeatThread.interrupt();
+        heartbeatThread.join();
     }
 
     private void joinNetwork() throws UnknownHostException, IOException, InterruptedException {
         // configuration of the net:
-        String myIP = InetAddress.getLocalHost().getHostAddress();
+        String myIP = null;
+        NetworkInterface itf = NetworkInterface.getByName("wlo1");
+        Enumeration<InetAddress> addreses = itf.getInetAddresses();
+        while (addreses.hasMoreElements()) {
+            InetAddress address = addreses.nextElement();
+            if (address instanceof Inet4Address) {
+                myIP = address.getHostAddress();
+            }
+        }
         System.out.println("Your IP address is: " + myIP + " Share it with one of the nodes."); // how do we control
                                                                                                 // which one?
         System.out.println("Write the IP address of the node next to you: ");
@@ -85,6 +115,7 @@ public class Main {
                 String name = message.getString("user");
                 connectionThreads.put(new P2PConnection(name, connectedSocket), null);
                 System.out.println("You are listening from " + name);
+                serverSocket.close();
             } catch (UnknownHostException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -117,8 +148,9 @@ public class Main {
     }
 
     private void startP2PConnections() {
-        for (Map.Entry<P2PConnection, Thread> entry: connectionThreads.entrySet()) {
-            if (entry.getValue() != null)    continue;
+        for (Map.Entry<P2PConnection, Thread> entry : connectionThreads.entrySet()) {
+            if (entry.getValue() != null)
+                continue;
 
             connectionThreads.put(entry.getKey(), new Thread(entry.getKey()));
         }
@@ -132,10 +164,13 @@ public class Main {
         while (!exit) {
             // shows options to start or join party
             System.out.println("You are not currently in a party");
-            System.out.println("Type 'party' to start a new party or wait for an invitation to join an existing party");
+            System.out.println(
+                    "Type 'party' to start a new party, 'exit' to quit the app, or wait for an invitation to join an existing party");
             String input = scanner.nextLine();
 
-            if (this.partyAnswers.getWaitingConnection() != null) {
+            if (input.equals("exit")) {
+                exit = true;
+            } else if (this.partyAnswers.getWaitingConnection() != null) {
                 boolean yes = receiveYN(input);
                 partyAnswers.setWaitingConnection(null);
                 partyAnswers.setAnswer(yes);
@@ -156,7 +191,6 @@ public class Main {
             } else {
                 System.out.println("Invalid command \"" + input + "\"");
             }
-
         }
     }
 
@@ -171,8 +205,8 @@ public class Main {
         for (Map.Entry<P2PConnection, Thread> entry : connectionThreads.entrySet()) {
             Thread thread = entry.getValue();
             if (thread.isAlive()) {
-            thread.interrupt();
-        }
+                thread.interrupt();
+            }
         }
     }
 
@@ -207,11 +241,16 @@ public class Main {
      * out the options that the user has and it will process the user's input.
      * This methdo will handle the situation where the user is disconnected from the
      * host
+     * 
+     * @throws IOException
+     * @throws UnknownHostException
+     * @throws InterruptedException
      */
-    private void playingPartyMenu() {
+    private void playingPartyMenu() throws UnknownHostException, IOException, InterruptedException {
         String action;
+        Boolean exit = false;
 
-        while (true) {
+        while (exit) {
             System.out.println("You are in a party! You can use either of these commands:"
                     + "- play: if you want to play the music"
                     + "- pause: if you want to stop the song"
@@ -221,6 +260,10 @@ public class Main {
                     + "Note: if your request is not posible to execute (f.e you skip and it is the last song), your request will be ignored");
 
             action = scanner.nextLine();
+
+            if (action.equals("exit")) {
+                exit = true;
+            }
 
             if (delayedHeartbeat) {
                 if (!receiveYN(action))
@@ -245,6 +288,8 @@ public class Main {
                 continue;
             }
         }
+
+        p2pmenu();
 
     }
 
@@ -372,8 +417,8 @@ public class Main {
      * getters/setters
      *******************************************************************************************/
 
-    public MusicPlayerThread getMusicPlayerThread() {
-        return musicPlayerThread;
+    public MusicPlayerTask getMusicPlayerTask() {
+        return musicPlayerTask;
     }
 
     public Heartbeat getHeartbeat() {

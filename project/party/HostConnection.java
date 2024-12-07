@@ -2,14 +2,10 @@ package party;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.time.Instant;
-
 import org.json.JSONObject;
 
 import main.Main;
-import music_player.MusicPlayerThread;
 import music_player.Update;
-import party.heartbeat.Heartbeat;
 import utils.MessageType;
 import utils.MySocket;
 
@@ -49,13 +45,13 @@ public class HostConnection extends PartyConnection {
         Main main = Main.getInstance();
         long time = main.getNearestChange();
 
-        Update update = main.getMusicPlayerThread().createUpdate(act, time);
+        Update update = main.getMusicPlayerTask().createUpdate(act, time);
 
         main.getHeartbeat().lastUpdate(time);
 
         sendUpdateToMembers(update, main);
 
-        main.getMusicPlayerThread().addChange(update);
+        main.getMusicPlayerTask().addChange(update);
     }
 
     public static void sendUpdateToMembers(Update update, Main main) {

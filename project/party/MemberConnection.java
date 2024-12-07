@@ -32,7 +32,7 @@ public class MemberConnection extends PartyConnection {
         try {
             while ((message = socket.receive(MessageType.EXECUTE_ACTION.toString())) != null) {
                 Update update = Update.parsefromJSON(message);
-                Main.getInstance().getMusicPlayerThread().addChange(update);
+                Main.getInstance().getMusicPlayerTask().addChange(update);
             }
 
             return;

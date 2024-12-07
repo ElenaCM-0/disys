@@ -11,12 +11,12 @@ import javafx.application.Platform;
 import party.Action;
 import utils.SongInstant;
 
-public class MusicPlayerThread implements Runnable {
+public class MusicPlayerTask implements Runnable {
 
     private MusicPlayer mp;
     private List<Update> updates = new ArrayList<>();
 
-    public MusicPlayerThread(MusicPlayer mp) {
+    public MusicPlayerTask(MusicPlayer mp) {
         this.mp = mp;
     }
 
