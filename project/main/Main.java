@@ -95,15 +95,9 @@ public class Main {
 
     private void joinNetwork() throws UnknownHostException, IOException, InterruptedException {
         // configuration of the net:
-        String myIP = null;
-        NetworkInterface itf = NetworkInterface.getByName("wlo1");
-        Enumeration<InetAddress> addreses = itf.getInetAddresses();
-        while (addreses.hasMoreElements()) {
-            InetAddress address = addreses.nextElement();
-            if (address instanceof Inet4Address) {
-                myIP = address.getHostAddress();
-            }
-        }
+        System.out.println("Write your IP address");
+        String myIP = scanner.nextLine();
+
         System.out.println("Your IP address is: " + myIP + " Share it with one of the nodes."); // how do we control
                                                                                                 // which one?
         System.out.println("Write the IP address of the node next to you: ");

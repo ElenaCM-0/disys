@@ -222,3 +222,7 @@ Whoever gets the lock:
 - non playing party menu finish (now called p2pmenu) (Consuelo)
 - playing party menu finish (Elena C)
 
+
+### Comments
+
+- We send the songs with the request, but in reality we would not do it like this
