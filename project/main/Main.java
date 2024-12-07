@@ -169,22 +169,26 @@ public class Main {
 
             userInput = true;
 
-            if (partyAnswers.getWaitingConnection() != null) {
+            if (partyRequests.getWaitingConnection() != null) {
                 host = false;
                 boolean yes = receiveYN(input);
 
-                partyAnswers.setAnswer(yes);
+                partyRequests.setAnswer(yes);
                 if (yes) {
-                    joinParty(partyAnswers.getWaitingConnection());
+                    joinParty(partyRequests.getWaitingConnection());
                 }
 
+                if (input.equalsIgnoreCase("party")) {
+                    host = true;
+                    startParty();
+                }
             }
 
             /*
              * It is if and not else if because of the case where the user said yes and then
              * got a party request
              */
-            if (input.equalsIgnoreCase("party")) {
+            else if (input.equalsIgnoreCase("party")) {
                 host = true;
                 startParty();
             } else {

@@ -67,10 +67,10 @@ public class P2PConnection extends Connection {
 
             if (main.getHost()) return false;
         }
-        
-        System.out.println(peer + " is hosting a playin party, do you want to join?");
 
         request.setWaitingConnection(this);
+        
+        System.out.println(peer + " is hosting a playin party, do you want to join?");
 
         request.setAnswer(null);
 
