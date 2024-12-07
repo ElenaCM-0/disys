@@ -2,6 +2,8 @@ package p2p;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.json.JSONObject;
 import main.Main;
@@ -31,7 +33,7 @@ public class P2PConnection extends Connection {
 
                 switch (type) {
                     case MessageType.PARTY_REQUEST:
-                        if (processPartyRequest()) return;
+                        if (processPartyRequest(message)) return;
                         break;
                     case MessageType.PARTY_RESPONSE:
                         if (processPartyResponse()) return;
@@ -50,7 +52,7 @@ public class P2PConnection extends Connection {
     /**
      * @return true if the thread should finish execution after calling the method, false otherwise
      */
-    private boolean processPartyRequest() {
+    private boolean processPartyRequest(JSONObject message) {
         Main main = Main.getInstance();
 
         if (main.getHost() != true) return false;
@@ -79,7 +81,19 @@ public class P2PConnection extends Connection {
 
         request.releaseLock();
 
-        return answer;
+        if (answer == false) return false;
+
+        int num_songs = message.getInt("num_songs");
+
+        List<String> song_list = new ArrayList<>();
+
+        for (int i = 0; i < num_songs; i++) {
+            song_list.add(message.getString("song_" + i));
+        }
+
+        main.addPartySongs(song_list);
+
+        return true;
     }
 
     /**

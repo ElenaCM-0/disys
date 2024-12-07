@@ -202,18 +202,15 @@ public class Main {
          * -Create heartbeat thread
          */
 
-        Connection waitingConnection = partyAnswers.getWaitingConnection();
         for (Connection c : this.connectionThreads.keySet()) {
-            if (!c.equals(waitingConnection)) {
+            if (!c.equals(hostConnection)) {
                 connectionThreads.get(c).interrupt();
             }
         }
-        this.partyConnection = new MemberConnection(waitingConnection);
+        this.partyConnection = new MemberConnection(hostConnection);
         partyConnection.run();
-        List<String> listOfSongs = new ArrayList<>();
-        ; // how do we get it??
-        MusicPlayer musicPlayer = new MusicPlayer(listOfSongs);
-        musicPlayerThread = new Thread(new MusicPlayerTask(musicPlayer));
+        
+        musicPlayerThread = new Thread(musicPlayerTask);
         musicPlayerThread.run();
         this.heartbeat = new MemberHeartbeat();
         heartbeat.run();
@@ -393,6 +390,14 @@ public class Main {
             }
         }
         return partySongs;
+    }
+
+    /**
+     * Method that will create a music player with the songs sent by the host
+     * @param song_list
+     */
+    public void addPartySongs(List<String> song_list) {
+        musicPlayerTask = new MusicPlayerTask(new MusicPlayer(song_list));
     }
 
     /*******************************************************************************************
