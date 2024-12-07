@@ -232,7 +232,11 @@ public class Main {
         JSONObject request = new JSONObject();
 
         request.put("type", MessageType.PARTY_REQUEST);
-
+        int num_songs = partySongs.size();
+        request.put("num_songs", num_songs);
+        for (int i = 0; i < num_songs; i++) {
+            request.put("song_" + i, partySongs.get(i));
+        }
         try {
             sendToAllConnections(request);
         } catch (IOException e) {
