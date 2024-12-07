@@ -7,7 +7,6 @@ import utils.SharedInfo;
 import music_player.MusicPlayerTask;
 import utils.Connection;
 import music_player.MusicPlayer;
-import music_player.MusicPlayerThread;
 import p2p.P2PConnection;
 import party.Action;
 import party.PartyConnection;
@@ -38,7 +37,6 @@ public class Main {
     private Heartbeat heartbeat;
     private List<String> availableSongs;
     private boolean delayedHeartbeat = false;
-    private boolean host;
     private MusicPlayerTask musicPlayerTask;
     private Scanner scanner = new Scanner(System.in);
     private PartyConnection partyConnection; /*
@@ -225,7 +223,7 @@ public class Main {
         List<String> listOfSongs = new ArrayList<>();
         ; // how do we get it??
         MusicPlayer musicPlayer = new MusicPlayer(listOfSongs);
-        musicPlayerThread = new MusicPlayerThread(musicPlayer);
+        musicPlayerThread = new Thread(new MusicPlayerTask(musicPlayer));
         musicPlayerThread.run();
         this.heartbeat = new MemberHeartbeat();
         heartbeat.run();
@@ -481,7 +479,7 @@ public class Main {
      *         otherwise
      */
     public boolean getInput() {
-        return host;
+        return userInput;
     }
 
     /**
