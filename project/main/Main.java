@@ -27,11 +27,13 @@ import java.util.List;
 import java.util.Map;
 
 public class Main {
+    private final List<String> availableSongs = List.of("song1", "song2", "song3", "song4");
+    private final int TIMEOUT = 30;
+
     private static Main instance = null;
     private Thread heartbeatThread;
     private Thread musicPlayerThread;
     private Heartbeat heartbeat;
-    private final List<String> availableSongs = List.of("song1", "song2", "song3", "song4");
     private boolean delayedHeartbeat = false;
     private MusicPlayerTask musicPlayerTask;
     private Scanner scanner = new Scanner(System.in);
@@ -48,6 +50,9 @@ public class Main {
 
     private boolean userInput = false;
     private Boolean host = null;
+
+    private boolean receivedResponse;
+    private boolean timeout;
 
     public static Main getInstance() {
         if (instance == null)
@@ -184,6 +189,7 @@ public class Main {
                 if (input.equalsIgnoreCase("party")) {
                     host = true;
                     startParty();
+                    host = false;
                 }
             }
 
@@ -202,6 +208,13 @@ public class Main {
             host = null;
             userInput = false;
         }
+    }
+
+    /**
+     * @return the scanner for the user
+     */
+    public Scanner getScanner() {
+        return scanner;
     }
 
     private void joinParty(Connection hostConnection) throws UnknownHostException, IOException {
@@ -255,28 +268,39 @@ public class Main {
             e.printStackTrace();
         }
 
-        /* Set timeout to avoid waiting forever
+        Boolean receivedResponse = false;
 
-        while () {
-            String input = scanner.nextLine();
+        long startTime = System.currentTimeMillis();
 
-            userInput = true;
-
-            if (partyAnswers.getWaitingConnection() != null) {
-                host = false;
-                boolean yes = receiveYN(input);
-
-                partyRequests.setAnswer(yes);
-                if (yes) {
-                    joinParty(partyRequests.getWaitingConnection());
-                }
-
-                if (input.equalsIgnoreCase("party")) {
-                    host = true;
-                    startParty();
-                }
+        /* Set thread timeout to avoid waiting forever */
+        Thread thr = new Thread(() -> {
+            try {
+                Thread.sleep(TIMEOUT * 1000);
+            } catch (InterruptedException e) {
+                return;
             }
-            */
+
+            if (!receivedResponse) {
+                System.out.println("The other nodes are not answering, press ENTER to return to the previous menu");
+            } 
+        });
+        thr.start();
+
+        String input;
+
+        Boolean response;
+        
+        while (System.currentTimeMillis() - startTime <= TIMEOUT/1000) {
+            input = scanner.nextLine();
+
+            if (partyRequests.getWaitingConnection() != null) {
+                
+            }
+
+        }
+
+        host = null;
+            
     }
 
     /**
