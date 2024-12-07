@@ -89,16 +89,22 @@ public class Main {
             // Not sure if this can happpen but just in case
             if (thr.isAlive()) {
                 thr.interrupt();
-                thr.join();
             }
+            thr.join();
             conn.close();
         }
         if (musicPlayerThread != null) {
-            musicPlayerThread.interrupt();
+            if (musicPlayerThread.isAlive()) {
+                musicPlayerThread.interrupt();
+
+            }
             musicPlayerThread.join();
+
         }
         if (heartbeatThread != null) {
-            heartbeatThread.interrupt();
+            if (heartbeatThread.isAlive()) {
+                heartbeatThread.interrupt();
+            }
             heartbeatThread.join();
         }
 
@@ -240,6 +246,7 @@ public class Main {
          * -Create a music player and a music player thread and execute
          * -Create heartbeat thread
          */
+        boolean partyStarted = false;
         Thread thr;
         for (Connection c : this.connectionThreads.keySet()) {
 
@@ -259,7 +266,14 @@ public class Main {
         heartbeat = new MemberHeartbeat();
         heartbeatThread = new Thread(heartbeat);
         heartbeatThread.start();
-        playingPartyMenu();
+
+        // TODO (ElenaRG) Set to true partyStarted if you have been accepted
+        if (partyStarted) {
+            playingPartyMenu();
+            // Connnections with other peers are reopened so new requests can be listened
+            // after a party
+            reopenConnections();
+        }
     }
 
     /**
@@ -276,6 +290,7 @@ public class Main {
         /* Send the request to the other nodes */
 
         JSONObject request = new JSONObject();
+        boolean partyStarted = false;
 
         request.put("type", MessageType.PARTY_REQUEST.toString());
         int num_songs = partySongs.size();
@@ -334,6 +349,30 @@ public class Main {
 
         host = null;
 
+        // TODO (ElenaCM) Set to true partyStarted if you have received an answer
+        if (partyStarted) {
+            playingPartyMenu();
+            // Connnections with other peers are reopened so new requests can be listened
+            // after a party
+            reopenConnections();
+        }
+
+    }
+
+    /**
+     * Reopens connections with all peers who are up and running in the network
+     * after a party
+     */
+    private void reopenConnections() {
+        P2PConnection conn;
+        Thread thr;
+        for (Entry<P2PConnection, Thread> e : connectionThreads.entrySet()) {
+            conn = e.getKey();
+            thr = e.getValue();
+            if (!thr.isAlive() && !conn.isClosed()) {
+                thr.start();
+            }
+        }
     }
 
     /**
@@ -363,6 +402,7 @@ public class Main {
 
             if (action.equals("exit")) {
                 exit = true;
+                continue;
             }
 
             if (delayedHeartbeat) {

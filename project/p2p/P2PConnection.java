@@ -129,4 +129,8 @@ public class P2PConnection extends Connection {
     public void close() throws IOException {
         this.socket.close();
     }
+
+    public boolean isClosed() {
+        return this.socket.isClosed();
+    }
 }

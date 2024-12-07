@@ -136,4 +136,8 @@ public class MySocket {
     public void close() throws IOException {
         this.tunnel.close();
     }
+
+    public boolean isClosed() {
+        return this.tunnel.isClosed();
+    }
 }
