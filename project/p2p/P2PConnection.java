@@ -33,10 +33,10 @@ public class P2PConnection extends Connection {
                 MessageType type = MessageType.match(message.getString("type"));
 
                 switch (type) {
-                    case MessageType.PARTY_REQUEST:
+                    case PARTY_REQUEST:
                         if (processPartyRequest(message)) return;
                         break;
-                    case MessageType.PARTY_RESPONSE:
+                    case PARTY_RESPONSE:
                         if (processPartyResponse()) return;
 
                         break;
