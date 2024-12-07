@@ -132,4 +132,8 @@ public class MySocket {
                 return message;
         }
     }
+
+    public void close() throws IOException {
+        this.tunnel.close();
+    }
 }
