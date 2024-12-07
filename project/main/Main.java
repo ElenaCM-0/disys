@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 public class Main {
     private static Main instance = null;
@@ -73,20 +74,29 @@ public class Main {
         main.exitApp();
     }
 
-    private void exitApp() throws InterruptedException {
+    private void exitApp() throws InterruptedException, IOException {
         System.out.println("Exiting app..,");
-
-        for (Thread thr : this.connectionThreads.values()) {
+        Thread thr;
+        P2PConnection conn;
+        for (Entry<P2PConnection, Thread> e : this.connectionThreads.entrySet()) {
+            conn = e.getKey();
+            thr = e.getValue();
             // Not sure if this can happpen but just in case
             if (thr != null) {
                 thr.interrupt();
                 thr.join();
             }
+            conn.close();
         }
-        musicPlayerThread.interrupt();
-        musicPlayerThread.join();
-        heartbeatThread.interrupt();
-        heartbeatThread.join();
+        if (musicPlayerThread != null) {
+            musicPlayerThread.interrupt();
+            musicPlayerThread.join();
+        }
+        if (heartbeatThread != null) {
+            heartbeatThread.interrupt();
+            heartbeatThread.join();
+        }
+
     }
 
     private void joinNetwork() throws UnknownHostException, IOException, InterruptedException {
@@ -155,7 +165,7 @@ public class Main {
         }
     }
 
-    private void p2pmenu() throws UnknownHostException, IOException {
+    private void p2pmenu() throws UnknownHostException, IOException, InterruptedException {
         startP2PConnections();
 
         Boolean exit = false;
@@ -165,7 +175,7 @@ public class Main {
             // shows options to start or join party
             System.out.println("You are not currently in a party");
             System.out.println("Type 'party' to start a new party or wait for an invitation to join an existing party");
-    
+
             String input = scanner.nextLine();
 
             userInput = true;
@@ -194,6 +204,9 @@ public class Main {
             else if (input.equalsIgnoreCase("party")) {
                 host = true;
                 startParty();
+            } else if (input.equalsIgnoreCase("exit")) {
+                host = false;
+                exit = true;
             } else {
                 host = false;
                 System.out.println("Invalid command \"" + input + "\"");
@@ -220,7 +233,7 @@ public class Main {
         }
         this.partyConnection = new MemberConnection(hostConnection);
         partyConnection.run();
-        
+
         musicPlayerThread = new Thread(musicPlayerTask);
         musicPlayerThread.run();
         this.heartbeat = new MemberHeartbeat();
@@ -255,28 +268,29 @@ public class Main {
             e.printStackTrace();
         }
 
-        /* Set timeout to avoid waiting forever
-
-        while () {
-            String input = scanner.nextLine();
-
-            userInput = true;
-
-            if (partyAnswers.getWaitingConnection() != null) {
-                host = false;
-                boolean yes = receiveYN(input);
-
-                partyRequests.setAnswer(yes);
-                if (yes) {
-                    joinParty(partyRequests.getWaitingConnection());
-                }
-
-                if (input.equalsIgnoreCase("party")) {
-                    host = true;
-                    startParty();
-                }
-            }
-            */
+        /*
+         * Set timeout to avoid waiting forever
+         * 
+         * while () {
+         * String input = scanner.nextLine();
+         * 
+         * userInput = true;
+         * 
+         * if (partyAnswers.getWaitingConnection() != null) {
+         * host = false;
+         * boolean yes = receiveYN(input);
+         * 
+         * partyRequests.setAnswer(yes);
+         * if (yes) {
+         * joinParty(partyRequests.getWaitingConnection());
+         * }
+         * 
+         * if (input.equalsIgnoreCase("party")) {
+         * host = true;
+         * startParty();
+         * }
+         * }
+         */
     }
 
     /**
@@ -431,6 +445,7 @@ public class Main {
 
     /**
      * Method that will create a music player with the songs sent by the host
+     * 
      * @param song_list
      */
     public void addPartySongs(List<String> song_list) {

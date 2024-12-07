@@ -34,10 +34,12 @@ public class P2PConnection extends Connection {
 
                 switch (type) {
                     case PARTY_REQUEST:
-                        if (processPartyRequest(message)) return;
+                        if (processPartyRequest(message))
+                            return;
                         break;
                     case PARTY_RESPONSE:
-                        if (processPartyResponse()) return;
+                        if (processPartyResponse())
+                            return;
 
                         break;
                     default:
@@ -51,36 +53,42 @@ public class P2PConnection extends Connection {
     }
 
     /**
-     * @return true if the thread should finish execution after calling the method, false otherwise
+     * @return true if the thread should finish execution after calling the method,
+     *         false otherwise
      */
     private boolean processPartyRequest(JSONObject message) {
         Main main = Main.getInstance();
 
-        if (main.getHost() != null && main.getHost()) return false;
+        if (main.getHost() != null && main.getHost())
+            return false;
 
         SharedInfo request = main.getRequest();
 
         request.acquireLock();
 
         if (main.getInput()) {
-            while (main.getHost() == null);
+            while (main.getHost() == null)
+                ;
 
-            if (main.getHost()) return false;
+            if (main.getHost())
+                return false;
         }
 
         request.setWaitingConnection(this);
-        
+
         System.out.println(peer + " is hosting a playin party, do you want to join?");
 
         request.setAnswer(null);
 
         Boolean answer;
 
-        while ((answer = request.getAnswer()) == null);
+        while ((answer = request.getAnswer()) == null)
+            ;
 
         request.releaseLock();
 
-        if (answer == false) return false;
+        if (answer == false)
+            return false;
 
         int num_songs = message.getInt("num_songs");
 
@@ -96,12 +104,14 @@ public class P2PConnection extends Connection {
     }
 
     /**
-     * @return true if the thread should finish execution after calling the method, false otherwise
+     * @return true if the thread should finish execution after calling the method,
+     *         false otherwise
      */
     private boolean processPartyResponse() {
         Main main = Main.getInstance();
 
-        if (main.getHost() != true) return false;
+        if (main.getHost() != true)
+            return false;
 
         SharedInfo answer = main.getResponse();
 
@@ -114,5 +124,9 @@ public class P2PConnection extends Connection {
         System.out.println(peer + " wants to join your party, accept?");
 
         return true;
+    }
+
+    public void close() throws IOException {
+        this.socket.close();
     }
 }
