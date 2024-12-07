@@ -15,9 +15,6 @@ import party.heartbeat.MemberHeartbeat;
 import party.MemberConnection;
 
 import java.io.IOException;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.UnknownHostException;
 import java.time.*;
@@ -25,7 +22,6 @@ import org.json.JSONObject;
 
 import java.util.Scanner;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +31,7 @@ public class Main {
     private Thread heartbeatThread;
     private Thread musicPlayerThread;
     private Heartbeat heartbeat;
-    private List<String> availableSongs;
+    private final List<String> availableSongs = List.of("song1", "song2", "song3", "song4");
     private boolean delayedHeartbeat = false;
     private MusicPlayerTask musicPlayerTask;
     private Scanner scanner = new Scanner(System.in);
