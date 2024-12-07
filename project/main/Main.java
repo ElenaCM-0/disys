@@ -31,7 +31,6 @@ public class Main {
     private Heartbeat heartbeat;
     private List<String> availableSongs;
     private boolean delayedHeartbeat = false;
-    private boolean host;
     private MusicPlayerThread musicPlayerThread;
     private Scanner scanner = new Scanner(System.in);
     private PartyConnection partyConnection; /*
@@ -44,6 +43,9 @@ public class Main {
     private SharedInfo partyAnswers = new SharedInfo();
     private Map<P2PConnection, Thread> connectionThreads = new HashMap<>();
     private static final int PORT = 1234;
+
+    private boolean userInput = false;
+    private Boolean host = null;
 
     public static Main getInstance() {
         if (instance == null)
@@ -131,34 +133,37 @@ public class Main {
 
         Boolean exit = false;
 
+        // shows options to start or join party
+        System.out.println("You are not currently in a party");
+        System.out.println("Type 'party' to start a new party or wait for an invitation to join an existing party");
+
         while (!exit) {
-            // shows options to start or join party
-            System.out.println("You are not currently in a party");
-            System.out.println("Type 'party' to start a new party or wait for an invitation to join an existing party");
             String input = scanner.nextLine();
 
-            if (this.partyAnswers.getWaitingConnection() != null) {
+            userInput = true;
+
+            if (partyAnswers.getWaitingConnection() != null) {
+                host = false;
                 boolean yes = receiveYN(input);
-                partyAnswers.setWaitingConnection(null);
+
                 partyAnswers.setAnswer(yes);
                 if (yes) {
-                    joinParty();
-                    // Connection waitingConnection = partyAnswers.getWaitingConnection();
-                    // for (Connection c : this.connectionThreads.keySet()) {
-                    // if (!c.equals(waitingConnection)) {
-                    // connectionThreads.get(c).interrupt();
-                    // }
-                    // }
-                    // this.partyConnection = new MemberConnection(waitingConnection);
-                    // this.playingPartyMenu();
+                    joinParty(partyAnswers.getWaitingConnection());
                 }
 
-            } else if (input.equals("party")) {
+            }
+            
+            /* It is if and not else if because of the case where the user said yes and then got a party request */
+            if (input.equalsIgnoreCase("party")) {
+                host = true;
                 startParty();
             } else {
+                host = false;
                 System.out.println("Invalid command \"" + input + "\"");
             }
 
+            host = null;
+            userInput = false;
         }
     }
 
@@ -268,24 +273,43 @@ public class Main {
      * @return true if the user said 'Yes', false if the user said 'No'
      */
     private boolean receiveYN(String answer) {
-        while (true) {
-            switch (answer) {
-                case "Y":
-                case "Yes":
-                case "y":
-                case "yes":
-                    return true;
-                case "N":
-                case "No":
-                case "n":
-                case "no":
-                    return false;
-            }
+        Boolean yes;
+
+        yes = processYN(answer);
+
+        while (yes == null) {
 
             System.out.println("Error, please write \'yes\' or \'no\'");
 
             answer = scanner.nextLine();
+            
+            yes = processYN(answer);
         }
+
+        return yes;
+    }
+
+    /**
+     * This method will process the user input and interpret it as yes, no or neither
+     * 
+     * @param answer The answer the user has given
+     * @return true if the user said 'Yes', false if the user said 'No', null if it was neither
+     */
+    private Boolean processYN(String answer) {
+        switch (answer) {
+            case "Y":
+            case "Yes":
+            case "y":
+            case "yes":
+                return true;
+            case "N":
+            case "No":
+            case "n":
+            case "no":
+                return false;
+        }
+
+        return null;
     }
 
     /**
@@ -389,6 +413,34 @@ public class Main {
 
     public Heartbeat getHeartbeat() {
         return heartbeat;
+    }
+
+    /**
+     * @return The host variable, null if the main has not processed the user's answer, true if the user is trying to host a playing party, false otherwise
+     */
+    public Boolean getHost() {
+        return host;
+    }
+
+    /**
+     * @return The userInput variable, true if the user has written something, false otherwise
+     */
+    public boolean getInput() {
+        return host;
+    }
+
+    /**
+     * @return The SharedInfo for playing party responses
+     */
+    public SharedInfo getResponse() {
+        return partyAnswers;
+    }
+
+    /**
+     * @return The SharedInfo for playing party requests
+     */
+    public SharedInfo getRequest() {
+        return partyRequests;
     }
 
 }

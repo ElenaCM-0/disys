@@ -143,6 +143,8 @@ Steps:
         3.b.a - If command was not party, tell user: what was that? Back to step 0
         3.b.b - If command was party, move on to creating a playing party.
 
+main: release playing party response answering lock
+
 Connection:
 0- Waiting for messages
 
@@ -154,9 +156,9 @@ If host is false:
 4- Check if host is true:
     If host is true, back to 0
     If host is false
-5- Set myself as the last_request in main
-6- Set answer to be null
+
 7- Ask user
+5- Set myself as the last_request in main
 8- wait for answer to not be null
 9- When answer is not null, read what it is,
 
@@ -166,6 +168,10 @@ if answer is false,
 
 if answer is true, continue to playing party member
     Remember to release lock at some point
+
+Main has to put host back to false at some point
+Was nonsense starts off as null in the loop every time
+Set answer to null
 
 CASE 2:
 
@@ -215,3 +221,4 @@ Whoever gets the lock:
 - Node discovery (Elena R)
 - non playing party menu finish (now called p2pmenu) (Consuelo)
 - playing party menu finish (Elena C)
+
