@@ -3,12 +3,14 @@ package main;
 import utils.MessageType;
 import utils.MySocket;
 import utils.SharedInfo;
-
+import utils.Connection;
+import music_player.MusicPlayer;
 import music_player.MusicPlayerThread;
 import p2p.P2PConnection;
 import party.Action;
 import party.PartyConnection;
 import party.heartbeat.Heartbeat;
+import party.heartbeat.MemberHeartbeat;
 import party.MemberConnection;
 
 import java.io.IOException;
@@ -160,7 +162,7 @@ public class Main {
         }
     }
 
-    private void joinParty() {
+    private void joinParty(Connection hostConnection) throws UnknownHostException, IOException {
         // TODO Do all necessary things to join a party
         /*
          * -Close useless connections
@@ -168,12 +170,21 @@ public class Main {
          * -Create a music player and a music player thread and execute
          * -Create heartbeat thread
          */
-        for (Map.Entry<P2PConnection, Thread> entry : connectionThreads.entrySet()) {
-            Thread thread = entry.getValue();
-            if (thread.isAlive()) {
-            thread.interrupt();
-        }
-        }
+
+        Connection waitingConnection = partyAnswers.getWaitingConnection();
+        for (Connection c : this.connectionThreads.keySet()) {
+            if (!c.equals(waitingConnection)) {
+            connectionThreads.get(c).interrupt();
+            }
+        }   
+        this.partyConnection = new MemberConnection(waitingConnection);
+        partyConnection.run();
+        List<String> listOfSongs=new ArrayList<>();; //how do we get it?? 
+        MusicPlayer musicPlayer = new MusicPlayer(listOfSongs);
+        musicPlayerThread= new MusicPlayerThread(musicPlayer);
+        musicPlayerThread.run();
+        this.heartbeat= new MemberHeartbeat();
+        heartbeat.run();
     }
 
     /**
