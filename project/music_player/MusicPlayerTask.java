@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javafx.application.Platform;
 import party.Action;
@@ -15,6 +17,7 @@ public class MusicPlayerTask implements Runnable {
 
     private MusicPlayer mp;
     private List<Update> updates = new ArrayList<>();
+    private final Lock lock = new ReentrantLock();
 
     public MusicPlayerTask(MusicPlayer mp) {
         this.mp = mp;
@@ -29,7 +32,7 @@ public class MusicPlayerTask implements Runnable {
      * @return Update object with the mentioned changes reflected or null if that
      *         action can not be executed for some reason
      */
-    public Update createUpdate(Action action, long executionTime) {
+    private Update createUpdate(Action action, long executionTime) {
         PlayerStatus prevStatus = getStatus(executionTime);
         PlayerStatus newStatus = action.apply(this.mp, prevStatus);
         if (newStatus == null) {
@@ -96,6 +99,14 @@ public class MusicPlayerTask implements Runnable {
             scheduler.shutdown();
         }, delayInMillis, TimeUnit.MILLISECONDS);
 
+    }
+
+    public Update createAndAddUpdate(Action action, long executionTime) {
+        lock.lock();
+        Update newUpdate = this.createUpdate(action, executionTime);
+        this.addChange(newUpdate);
+        lock.unlock();
+        return newUpdate;
     }
 
     @Override

@@ -69,13 +69,11 @@ public class HostConnection extends PartyConnection {
         Main main = Main.getInstance();
         long time = main.getNearestChange();
 
-        Update update = main.getMusicPlayerTask().createUpdate(act, time);
+        Update update = main.getMusicPlayerTask().createAndAddUpdate(act, time);
 
         main.getHeartbeat().lastUpdate(time);
 
         sendUpdateToMembers(update, main);
-
-        main.getMusicPlayerTask().addChange(update);
     }
 
     public static void startMembers() {
