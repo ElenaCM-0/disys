@@ -99,21 +99,24 @@ public class MySocket {
      */
     public JSONObject receive() throws IOException, InterruptedException {
         String messageStr;
-        try {
-            messageStr = in.readLine();
 
-            if (messageStr == null) {
-
-                return null;
+        while (true) {
+            try {
+                messageStr = in.readLine();
+    
+                if (messageStr == null) {
+    
+                    return null;
+                }
+    
+                return new JSONObject(messageStr);
+            } catch (IOException e) {
+                if (Thread.interrupted()) {
+                    throw new InterruptedException();
+                }
             }
-
-            return new JSONObject(messageStr);
-        } catch (IOException e) {
-            if (Thread.interrupted()) {
-                throw new InterruptedException();
-            }
-            return null;
         }
+        
 
     }
 

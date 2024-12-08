@@ -590,7 +590,7 @@ public class Main {
         Boolean exit = false;
 
         requestProcessed = true;
-        while (exit) {
+        while (!exit) {
             System.out.println("You are in a party! You can use either of these commands:"
                     + "- play: if you want to play the music"
                     + "- pause: if you want to stop the song"
