@@ -11,6 +11,8 @@ public class MySocket {
     private OutputStreamWriter out;
     private BufferedReader in;
 
+    private final int TIMEOUT = 10000;
+
     /**
      * It will create the channels for socket connection
      * 
@@ -18,6 +20,7 @@ public class MySocket {
      */
     public MySocket(Socket socket) throws UnknownHostException, IOException {
         this.tunnel = socket;
+        this.tunnel.setSoTimeout(TIMEOUT);
         try {
             out = new OutputStreamWriter(tunnel.getOutputStream(), StandardCharsets.UTF_8);
             in = new BufferedReader(new InputStreamReader(tunnel.getInputStream(), StandardCharsets.UTF_8));
@@ -92,18 +95,26 @@ public class MySocket {
      * 
      * @return The JSON object that was received
      * @throws IOException
+     * @throws InterruptedException
      */
-    public JSONObject receive() throws IOException {
+    public JSONObject receive() throws IOException, InterruptedException {
         String messageStr;
+        try {
+            messageStr = in.readLine();
 
-        messageStr = in.readLine();
+            if (messageStr == null) {
 
-        if (messageStr == null) {
+                return null;
+            }
 
+            return new JSONObject(messageStr);
+        } catch (IOException e) {
+            if (Thread.interrupted()) {
+                throw new InterruptedException();
+            }
             return null;
         }
 
-        return new JSONObject(messageStr);
     }
 
     /**
@@ -115,20 +126,14 @@ public class MySocket {
      * 
      * @return The JSON object that was received
      * @throws IOException
+     * @throws InterruptedException
      */
-    public JSONObject receive(String type) throws IOException {
-        String messageStr;
+    public JSONObject receive(String type) throws IOException, InterruptedException {
         JSONObject message;
 
         while (true) {
-            messageStr = in.readLine();
-
-            if (messageStr == null)
-                return null;
-
-            message = new JSONObject(messageStr);
-
-            if (message.getString("type").equals(type))
+            message = this.receive();
+            if (message != null && message.getString("type").equals(type))
                 return message;
         }
     }

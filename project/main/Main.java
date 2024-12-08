@@ -228,10 +228,7 @@ public class Main {
                 connectionThreads.put(new P2PConnection(name, connectedSocket), null);
                 System.out.println("You are listening from " + name);
                 serverSocket.close();
-            } catch (UnknownHostException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (IOException e) {
+            } catch (IOException | InterruptedException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
@@ -319,7 +316,8 @@ public class Main {
         }
     }
 
-    private void joinParty(P2PConnection hostConnection) throws UnknownHostException, IOException, InterruptedException {
+    private void joinParty(P2PConnection hostConnection)
+            throws UnknownHostException, IOException, InterruptedException {
         // TODO Do all necessary things to join a party
         /*
          * -Close useless connections
