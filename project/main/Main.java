@@ -257,7 +257,7 @@ public class Main {
         });
         thr.start();
         System.out.println("Server socket created, press ENTER to move to the next step");
-        scanner.nextLine();
+        s.nextLine();
 
         P2PConnection nbConnection = new P2PConnection(userNeighbour, ipNeighbour, PORT);
 
