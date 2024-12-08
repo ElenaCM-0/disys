@@ -85,6 +85,16 @@ public class Main {
 
                 waker = WAKER.INPUT;
                 writer.println(input);
+
+                while (!requestProcessed){
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        continue;
+                    }
+                }
+                    
+                talkToMain.unlock();
             }
 
             stdin.close();
@@ -306,11 +316,13 @@ public class Main {
                     switch (input) {
                         case "exit":
                             status = MAIN_STATUS.EXIT;
+                            requestProcessed = true;
                             return;
 
                         case "party":
                             status = MAIN_STATUS.HOST;
                             startParty();
+                            break;
                         default:
                             System.out.println("Invalid command \"" + input + "\"");
                             break;
@@ -336,7 +348,10 @@ public class Main {
          * -Create heartbeat thread
          */
 
+        requestProcessed = true;
+
         /* Set thread timeout to avoid waiting forever */
+
         Thread thr = new Thread(() -> {
             try {
                 Thread.sleep(TIMEOUT * 1000);
@@ -515,6 +530,8 @@ public class Main {
 
                             HostConnection.clearMembers();
 
+                            System.out.println("Exiting...");
+                            
                             return;
                         case "enough":
                             exit = true;
