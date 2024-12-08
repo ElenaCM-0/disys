@@ -55,7 +55,7 @@ public class P2PConnection extends Connection {
                         if (processStartParty(message))
                             return;
                         break;
-                        
+
                     default:
                         break;
                 }
@@ -95,7 +95,8 @@ public class P2PConnection extends Connection {
 
         Boolean answer;
 
-        while ((answer = request.getAnswer()) == null);
+        while ((answer = request.getAnswer()) == null)
+            ;
 
         request.releaseLock();
 
@@ -121,7 +122,7 @@ public class P2PConnection extends Connection {
      */
     private boolean processPartyResponse() {
         sent_time = Instant.now().toEpochMilli() - sent_time;
-        
+
         Main main = Main.getInstance();
 
         SharedInfo answer = main.getResponse();
@@ -161,14 +162,17 @@ public class P2PConnection extends Connection {
     }
 
     public Long waitForMessage(int timeout) throws IOException {
+        if (party_time != null) {
+            return party_time;
+        }
         socket.setSoTimeout(timeout);
         try {
-            JSONObject answer= socket.receive();
-            Long time =answer.getLong("time");
+            JSONObject answer = socket.receive();
+            Long time = answer.getLong("time");
             return time;
         } catch (SocketTimeoutException e) {
             System.out.println("Timeout");
-            return null;
+            return party_time;
         }
     }
 
@@ -177,17 +181,20 @@ public class P2PConnection extends Connection {
     }
 
     /**
-     * This method restarts the time counter for the P2P connection class, the one that will keep track of how long the nodes take to respond
+     * This method restarts the time counter for the P2P connection class, the one
+     * that will keep track of how long the nodes take to respond
      */
     public static void restartTime() {
         max_response_time = 0;
     }
 
     /**
-     * Method that sends the party request, it will save the time when the message was sent
-      * @throws IOException 
-      */
-     public void sendPartyRequest(JSONObject request) throws IOException {
+     * Method that sends the party request, it will save the time when the message
+     * was sent
+     * 
+     * @throws IOException
+     */
+    public void sendPartyRequest(JSONObject request) throws IOException {
         socket.send(request);
         sent_time = Instant.now().toEpochMilli();
     }
