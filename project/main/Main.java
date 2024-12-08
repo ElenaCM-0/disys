@@ -507,7 +507,7 @@ public class Main {
 
             switch (waker) {
                 case CON:
-                    no = !receiveYN(input);
+                    no = !receiveYN();
 
                     partyAnswers.setAnswer(!no);
 
@@ -546,7 +546,7 @@ public class Main {
                     break;
                 case TIMEOUT:
                     System.out.println("The other users are not responding, cancel party?");
-                    if (receiveYN(input)) {
+                    if (receiveYN()) {
                         return;
                     }
 
@@ -607,7 +607,7 @@ public class Main {
             }
 
             if (delayedHeartbeat) {
-                if (!receiveYN(action))
+                if (!receiveYN())
                     return;
 
                 continue;
@@ -640,19 +640,20 @@ public class Main {
      * @param answer The current answer the user has given
      * @return true if the user said 'Yes', false if the user said 'No'
      */
-    private boolean receiveYN(String answer) {
-        Boolean yes;
+    private boolean receiveYN() {
+        Boolean yes = null;
         Scanner stdin = new Scanner(System.in);
 
-        yes = processYN(answer);
+        String answer;
 
         while (yes == null) {
-
-            System.out.println("Error, please write \'yes\' or \'no\'");
 
             answer = stdin.nextLine();
 
             yes = processYN(answer);
+
+            if (yes == null)
+                System.out.println("Error, please write \'yes\' or \'no\'");
         }
 
         stdin.close();
