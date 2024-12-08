@@ -150,7 +150,12 @@ public class Main {
      * Method that will free the lock to talk to the main
      */
     public void releaseMain() {
-        while (!requestProcessed) Thread.sleep(100);
+        while (!requestProcessed)
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                continue;
+            }
 
         talkToMain.unlock();
     }
