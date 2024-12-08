@@ -1,7 +1,6 @@
 package p2p;
 
 import java.io.IOException;
-import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -152,28 +151,16 @@ public class P2PConnection extends Connection {
     private boolean processStartParty(JSONObject message) {
         Main main = Main.getInstance();
 
+        main.requestMain();
+
         if (main.getStatus() != Main.MAIN_STATUS.JOIN) {
+            main.releaseMain();
             return false;
         }
 
         party_time = message.getLong("time");
-
-        return false;
-    }
-
-    public Long waitForMessage(int timeout) throws IOException {
-        if (party_time != null) {
-            return party_time;
-        }
-        socket.setSoTimeout(timeout);
-        try {
-            JSONObject answer = socket.receive();
-            Long time = answer.getLong("time");
-            return time;
-        } catch (SocketTimeoutException e) {
-            System.out.println("Timeout");
-            return party_time;
-        }
+        main.askUser(party_time.toString());
+        return true;
     }
 
     public static long getMaxTime() {
