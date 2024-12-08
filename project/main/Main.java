@@ -348,7 +348,14 @@ public class Main {
 
                 writer.println("aaaa");
 
-                while (!requestProcessed) Thread.sleep(100);
+                while (!requestProcessed){
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        continue;
+                    }
+                }
+                    
                 talkToMain.unlock();
             }
         });
@@ -450,7 +457,13 @@ public class Main {
 
                 writer.println("aaaa");
 
-                while (!requestProcessed) Thread.sleep(100);
+                while (!requestProcessed){
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        continue;
+                    }
+                }
 
                 talkToMain.unlock();
             }
