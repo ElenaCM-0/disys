@@ -48,7 +48,7 @@ public class P2PConnection extends Connection {
 
                         break;
                     case START_PARTY:
-                        if (processStartParty())
+                        if (processStartParty(message))
                             return;
                         break;
 
@@ -143,9 +143,16 @@ public class P2PConnection extends Connection {
         return true;
     }
 
-    private boolean processStartParty() {
+    private boolean processStartParty(JSONObject message) {
+        Main main = Main.getInstance();
 
-        return true;
+        if (main.getStatus() != Main.MAIN_STATUS.JOIN) {
+            return false;
+        }
+
+        party_time = message.getLong("time");
+
+        return false;
     }
 
     public Long waitForMessage(int timeout) throws IOException {
