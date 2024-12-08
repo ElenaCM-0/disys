@@ -227,6 +227,7 @@ public class Main {
     }
 
     private void joinNetwork() throws UnknownHostException, IOException, InterruptedException {
+        Scanner s = new Scanner(System.in);
         // configuration of the net:
         System.out.println("Write your IP address");
         String myIP = scanner.nextLine();
@@ -234,9 +235,9 @@ public class Main {
         System.out.println("Your IP address is: " + myIP + " Share it with one of the nodes."); // how do we control
                                                                                                 // which one?
         System.out.println("Write the IP address of the node next to you: ");
-        String ipNeighbour = scanner.nextLine();
+        String ipNeighbour = s.nextLine();
         System.out.println("Write the user name of the node next to you: ");
-        String userNeighbour = scanner.nextLine();
+        String userNeighbour = s.nextLine();
 
         ServerSocket serverSocket = new ServerSocket(PORT);
         Thread thr = new Thread(() -> {
@@ -266,7 +267,7 @@ public class Main {
 
         /* Send the node's name to the neighbour */
         System.out.println("Write the user name to send to your neighbour: ");
-        userNeighbour = scanner.nextLine();
+        userNeighbour = s.nextLine();
 
         message.put("user", userNeighbour);
 
