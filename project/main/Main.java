@@ -124,6 +124,7 @@ public class Main {
     private Scanner scanner = null;
     private PrintWriter writer;
     private PipedOutputStream pipedOutput;
+    private boolean requestProcessed;
 
     /**
      * Method that will be called by the threads when they want to print something
@@ -316,7 +317,7 @@ public class Main {
             }
 
             status = MAIN_STATUS.P2P;
-            talkToMain.unlock();
+            requestProcessed = true;
         }
     }
 
@@ -357,16 +358,15 @@ public class Main {
 
         if (waker == WAKER.TIMEOUT) {
             System.out.println("The host didn't accept you, going back to the menu...");
-            
+
             return;
         }
 
         status = MAIN_STATUS.PARTY;
 
-        talkToMain.unlock();
-
+        requestProcessed = true;
         Thread t;
-        
+
         for (Connection c : this.connectionThreads.keySet()) {
 
             if (!c.equals(hostConnection)) {
@@ -380,7 +380,7 @@ public class Main {
         partyConnection = new MemberConnection(hostConnection);
         partyConnectionThread = new Thread(this.partyConnection);
         partyConnectionThread.start();
-        
+
         musicPlayerTask.start(Long.valueOf(partyTime));
 
         heartbeat = new MemberHeartbeat();
@@ -460,7 +460,7 @@ public class Main {
         String input;
         boolean no;
 
-        talkToMain.unlock();
+        requestProcessed = true;
 
         boolean exit = false;
 
@@ -516,7 +516,7 @@ public class Main {
 
             }
 
-            talkToMain.unlock();
+            requestProcessed = true;
         }
 
         System.out.println("Creating the party...");
@@ -551,7 +551,7 @@ public class Main {
         String action;
         Boolean exit = false;
 
-        talkToMain.unlock();
+        requestProcessed = true;
         while (exit) {
             System.out.println("You are in a party! You can use either of these commands:"
                     + "- play: if you want to play the music"
