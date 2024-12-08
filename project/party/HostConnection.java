@@ -110,4 +110,17 @@ public class HostConnection extends PartyConnection {
         }
     }
 
+    /**
+     * Method that will send the start_party message
+      * @throws IOException 
+      */
+     public static void sendStartParty(long start_time) throws IOException {
+        JSONObject message = new JSONObject();
+
+        message.put("type", MessageType.START_PARTY.name());
+        message.put("time", start_time);
+
+        sendToMembers(message);
+    }
+
 }

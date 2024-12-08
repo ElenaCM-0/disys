@@ -83,7 +83,7 @@ public class Main {
                     /* There have been changes in the main before the input was processed */
                     continue;
                 }
-                
+
                 waker = WAKER.INPUT;
                 writer.println(input);
             }
@@ -397,10 +397,12 @@ public class Main {
         P2PConnection.restartTime();
         HostConnection.clearMembers();
 
-        System.out.println("Sendint the request...");
+        System.out.println("Sending the request...");
 
         try {
-            sendToAllConnections(request);
+            for (P2PConnection con : connectionThreads.keySet()) {
+                con.sendPartyRequest(request);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -428,11 +430,12 @@ public class Main {
 
         String input;
         boolean no;
-        P2PConnection conn;
 
         talkToMain.unlock();
-        boolean go_p2p = false;
-        while (!go_p2p && (num_party_nodes < max_party_nodes)) {
+
+        boolean exit = false;
+        
+        while (!exit && num_party_nodes < max_party_nodes) {
             System.out.println(
                     "Waiting for responses, write \"enough\" if you want to move on to creating the party or write \"exit\" to move to the previous menu");
             input = scanner.nextLine();
@@ -464,9 +467,10 @@ public class Main {
                                 return;
 
                             HostConnection.clearMembers();
-                            break;
+
+                            return;
                         case "enough":
-                            /** TODO, go to party */
+                            exit = true;
                             break;
                         default:
                             System.out.println("Unrecognised input");
@@ -476,22 +480,30 @@ public class Main {
                 case TIMEOUT:
                     System.out.println("The other users are not responding, cancel party?");
                     if (receiveYN(input)) {
-                        /** TODO, go to party */
                         return;
                     }
 
-                    go_p2p = true;
-                    break;
+                    exit = true;
 
             }
 
-            
+            talkToMain.unlock();
         }
 
-        /* Close remaining open connections, close threads, etc */
-        /* Open playing party threads */
-        playingPartyMenu();
+        System.out.println("Creating the party...");
 
+        /* Close remaining open threads */
+        connectionThreads.forEach((c, t) -> {
+            try {
+                endP2PThread(t);
+            } catch (InterruptedException e) {
+                
+            }
+        });
+
+        HostConnection.startMembers();
+
+        playingPartyMenu();
     }
 
     /**
@@ -671,19 +683,6 @@ public class Main {
     }
 
     /**
-     * Method that sends the given JSONObject to all the connections that the main
-     * has
-     * 
-     * @param message The object to be sent through the connections
-     * @throws IOException
-     */
-    public void sendToAllConnections(JSONObject message) throws IOException {
-        for (P2PConnection con : connectionThreads.keySet()) {
-            con.send(message);
-        }
-    }
-
-    /**
      * @return the amount of seconds ahead of the current time an action has to be
      *         for it to have time to reach all of the nodes and for the nodes to
      *         have time to take all of
@@ -701,7 +700,7 @@ public class Main {
      * @return the timestamp when the nearest change can be implemented
      */
     public long getNearestChange() {
-        return Instant.now().getEpochSecond() + getMilisec();
+        return Instant.now().toEpochMilli() + getMilisec();
     }
 
     /*******************************************************************************************

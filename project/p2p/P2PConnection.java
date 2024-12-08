@@ -2,6 +2,7 @@ package p2p;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +14,8 @@ import utils.MySocket;
 import utils.SharedInfo;
 
 public class P2PConnection extends Connection {
-    private static int max_response_time;
+    private static long max_response_time;
+    private long sent_time;
 
     public P2PConnection(String peer, MySocket socket) throws UnknownHostException, IOException {
         super(peer, socket);
@@ -105,6 +107,8 @@ public class P2PConnection extends Connection {
      *         false otherwise
      */
     private boolean processPartyResponse() {
+        sent_time = Instant.now().toEpochMilli() - sent_time;
+        
         Main main = Main.getInstance();
 
         SharedInfo answer = main.getResponse();
@@ -124,6 +128,10 @@ public class P2PConnection extends Connection {
 
         main.askUser(peer + " wants to join your party, accept?");
 
+        if (sent_time > max_response_time) {
+            max_response_time = sent_time;
+        }
+
         return true;
     }
 
@@ -132,5 +140,14 @@ public class P2PConnection extends Connection {
      */
     public static void restartTime() {
         max_response_time = 0;
+    }
+
+    /**
+     * Method that sends the party request, it will save the time when the message was sent
+      * @throws IOException 
+      */
+     public void sendPartyRequest(JSONObject request) throws IOException {
+        socket.send(request);
+        sent_time = Instant.now().toEpochMilli();
     }
 }

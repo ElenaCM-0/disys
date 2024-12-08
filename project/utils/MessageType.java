@@ -4,6 +4,7 @@ public enum MessageType {
     ACTION_REQUEST("action_request"),
     PARTY_REQUEST("party_request"),
     PARTY_RESPONSE("party_response"),
+    START_PARTY("start_party")
     EXECUTE_ACTION("action");
 
     private String type;
