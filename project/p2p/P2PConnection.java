@@ -60,31 +60,27 @@ public class P2PConnection extends Connection {
     private boolean processPartyRequest(JSONObject message) {
         Main main = Main.getInstance();
 
-        if (main.getHost() != null && main.getHost())
-            return false;
-
         SharedInfo request = main.getRequest();
 
         request.acquireLock();
 
-        if (main.getInput()) {
-            while (main.getHost() == null)
-                ;
+        /* Wait to talk to the user */
+        main.requestMain();
 
-            if (main.getHost())
-                return false;
+        if (main.getStatus() != Main.MAIN_STATUS.P2P) {
+            main.releaseMain();
+            return false;
         }
 
         request.setWaitingConnection(this);
 
-        System.out.println(peer + " is hosting a playin party, do you want to join?");
+        main.askUser(peer + " is hosting a playin party, do you want to join?");
 
         request.setAnswer(null);
 
         Boolean answer;
 
-        while ((answer = request.getAnswer()) == null)
-            ;
+        while ((answer = request.getAnswer()) == null);
 
         request.releaseLock();
 
@@ -111,18 +107,22 @@ public class P2PConnection extends Connection {
     private boolean processPartyResponse() {
         Main main = Main.getInstance();
 
-        if (main.getHost() != true)
-            return false;
-
         SharedInfo answer = main.getResponse();
 
         answer.acquireLock();
+
+        main.requestMain();
+
+        if (main.getStatus() != Main.MAIN_STATUS.HOST) {
+            main.releaseMain();
+            return false;
+        }
 
         answer.setWaitingConnection(this);
 
         answer.setAnswer(null);
 
-        System.out.println(peer + " wants to join your party, accept?");
+        main.askUser(peer + " wants to join your party, accept?");
 
         return true;
     }

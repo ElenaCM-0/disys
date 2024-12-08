@@ -1,5 +1,12 @@
 package utils;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.io.PrintWriter;
+import java.util.Scanner;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 /* the lock and ReentrantLock are to make sure only one thread
@@ -65,15 +72,5 @@ public class SharedInfo {
     // updates waitingConnection with a new connection/request
     public void setWaitingConnection(P2PConnection waitingConnection) {
         this.waitingConnection = waitingConnection;
-    }
-
-    
-
-    public enum WAKER {
-        CON, TIMEOUT, INPUT;
-    }
-
-    public enum MAIN_STATE {
-        NONE, EXIT, PARTY;
     }
 }

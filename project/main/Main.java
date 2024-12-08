@@ -16,12 +16,17 @@ import party.heartbeat.MemberHeartbeat;
 import party.MemberConnection;
 
 import java.io.IOException;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.UnknownHostException;
 import java.time.*;
 import org.json.JSONObject;
 
 import java.util.Scanner;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,7 +44,6 @@ public class Main {
     private Heartbeat heartbeat;
     private boolean delayedHeartbeat = false;
     private MusicPlayerTask musicPlayerTask;
-    private Scanner scanner = new Scanner(System.in);
     private PartyConnection partyConnection; /*
                                               * If you are the host, this will be a hostConnection, however, if you are
                                               * a playing party member, this will be the connection that connects you to
@@ -51,15 +55,51 @@ public class Main {
     private Map<P2PConnection, Thread> connectionThreads = new HashMap<>();
     private static final int PORT = 1234;
 
-    private boolean userInput = false;
-    private Boolean host = null;
+    /*
+     * private boolean userInput = false;
+     * private Boolean host = null;
+     * private boolean timeout;
+     * private Scanner scanner = new Scanner(System.in);
+     */
 
     private int num_party_nodes;
-    private boolean timeout;
+
+    private Main() throws IOException {
+        PipedInputStream pipedInput = new PipedInputStream();
+        pipedOutput = new PipedOutputStream(pipedInput);
+        writer = new PrintWriter(pipedOutput, true);
+
+        scanner = new Scanner(pipedInput);
+
+        userInput = new Thread(() -> {
+            Scanner stdin = new Scanner(System.in);
+            String input;
+            MAIN_STATUS status_before;
+            while ((input = stdin.nextLine()) != null) {
+                status_before = status;
+                talkToMain.lock();
+
+                if (status_before != status) {
+                    /* There have been changes in the main before the input was processed */
+                    continue;
+                }
+                
+                waker = WAKER.INPUT;
+                writer.println(input);
+            }
+
+            stdin.close();
+        });
+    }
 
     public static Main getInstance() {
         if (instance == null)
-            instance = new Main();
+            try {
+                instance = new Main();
+            } catch (IOException e) {
+                // TODO
+                return null;
+            }
 
         return instance;
     }
@@ -69,8 +109,62 @@ public class Main {
      * 
      * @throws InterruptedException
      *******************************************************************************************/
+    public enum WAKER {
+        CON, TIMEOUT, INPUT;
+    }
+
+    public enum MAIN_STATUS {
+        P2P, EXIT, JOIN, HOST;
+    }
+
+    private WAKER waker;
+    private MAIN_STATUS status;
+    private final Lock talkToMain = new ReentrantLock();
+    private Thread userInput;
+
+    private Scanner scanner = null;
+    private PrintWriter writer;
+    private PipedOutputStream pipedOutput;
+
+    /**
+     * Method that will be called by the threads when they want to print something
+     * 
+     * @param question The string they want to print to the screen
+     */
+    public void askUser(String question) {
+        writer.println(question);
+    }
+
+    /**
+     * Method that will wait on the lock to talk to the main
+     */
+    public void requestMain(){
+        talkToMain.lock();
+
+        waker = WAKER.CON;
+    }
+
+    /**
+     * Method that will free the lock to talk to the main
+     */
+    public void releaseMain(){
+        talkToMain.unlock();
+    }
+
+    /**
+     * 
+     * @return the main's current status, from the enum
+     */
+    public MAIN_STATUS getStatus() {
+        return status;
+    }
+
+    
+
     public static void main(String[] args) throws UnknownHostException, IOException, InterruptedException {
         Main main = Main.getInstance();
+
+        main.userInput.start();
 
         main.joinNetwork();
 
@@ -81,7 +175,7 @@ public class Main {
         main.exitApp();
     }
 
-    private void endP2PThread(Thread p2p) throws InterruptedException{
+    private void endP2PThread(Thread p2p) throws InterruptedException {
         // Not sure if this can happpen but just in case
         if (p2p.isAlive()) {
             p2p.interrupt();
@@ -96,7 +190,7 @@ public class Main {
             conn = e.getKey();
 
             endP2PThread(e.getValue());
-            
+
             conn.close();
         }
 
@@ -115,6 +209,13 @@ public class Main {
             heartbeatThread.join();
         }
 
+        try {
+            pipedOutput.close();
+        } catch (IOException e) {
+
+        } finally {
+            writer.close();
+        }
     }
 
     private void joinNetwork() throws UnknownHostException, IOException, InterruptedException {
@@ -172,9 +273,11 @@ public class Main {
 
     private void startP2PConnections() {
         connectionThreads.replaceAll((conn, thr) -> {
-            if (thr == null) thr = new Thread(conn);
+            if (thr == null)
+                thr = new Thread(conn);
 
-            if (!thr.isAlive() && !conn.isClosed()) thr.start();
+            if (!thr.isAlive() && !conn.isClosed())
+                thr.start();
 
             return thr;
         });
@@ -183,63 +286,49 @@ public class Main {
     private void p2pmenu() throws UnknownHostException, IOException, InterruptedException {
         startP2PConnections();
 
-        Boolean exit = false;
-        P2PConnection conn;
-
-        while (!exit) {
+        status = MAIN_STATUS.P2P;
+        while (true) {
             // shows options to start or join party
             System.out.println("You are not currently in a party");
             System.out.println("Type 'party' to start a new party or wait for an invitation to join an existing party");
 
             String input = scanner.nextLine();
 
-            userInput = true;
+            switch (waker) {
+                case WAKER.CON:
+                    System.out.println(input);
 
-            if ((conn = partyRequests.getWaitingConnection()) != null) {
-                host = false;
-                boolean yes = receiveYN(input);
+                    boolean yes = receiveYN("");
+                    partyRequests.setAnswer(yes);
 
-                partyRequests.setWaitingConnection(null);
-                partyRequests.setAnswer(yes);
+                    if (yes) {
+                        status = MAIN_STATUS.JOIN;
+                        joinParty(partyRequests.getWaitingConnection());
+                    }
+                    break;
 
-                if (yes) {
-                    joinParty(conn);
-                    continue;
-                }
+                case WAKER.INPUT:
+                    switch (input) {
+                        case "exit":
+                            status = MAIN_STATUS.EXIT;
+                            return;
 
-                if (input.equalsIgnoreCase("party")) {
-                    host = true;
-                    startParty();
-                    host = false;
-                    continue;
-                }
+                        case "party":
+                            status = MAIN_STATUS.HOST;
+                            startParty();
+                        default:
+                            System.out.println("Invalid command \"" + input + "\"");
+                            break;
+                    }
+                    break;
+
+                default:
+                    break;
             }
 
-            /*
-             * It is if and not else if because of the case where the user said yes and then
-             * got a party request
-             */
-            else if (input.equalsIgnoreCase("party")) {
-                host = true;
-                startParty();
-            } else if (input.equalsIgnoreCase("exit")) {
-                host = false;
-                exit = true;
-            } else {
-                host = false;
-                System.out.println("Invalid command \"" + input + "\"");
-            }
-
-            host = null;
-            userInput = false;
+            status = MAIN_STATUS.P2P;
+            talkToMain.unlock();
         }
-    }
-
-    /**
-     * @return the scanner for the user
-     */
-    public Scanner getScanner() {
-        return scanner;
     }
 
     private void joinParty(Connection hostConnection) throws UnknownHostException, IOException, InterruptedException {
@@ -283,11 +372,12 @@ public class Main {
      * This method will do all the necessary preparations for a user to create a
      * playing party
      * it should be called if the user selects "party" in the p2pmenu
-          * @throws InterruptedException 
-               * @throws IOException 
-               * @throws UnknownHostException 
-                    */
-                   private void startParty() throws InterruptedException, UnknownHostException, IOException {
+     * 
+     * @throws InterruptedException
+     * @throws IOException
+     * @throws UnknownHostException
+     */
+    private void startParty() throws InterruptedException, UnknownHostException, IOException {
         System.out.println("Starting party...");
 
         System.out.println("First, you must select the songs you would like to play in the playing party");
@@ -326,8 +416,12 @@ public class Main {
             }
 
             if (num_party_nodes == 0) {
-                System.out.println("The other nodes are not answering, press ENTER or write anything to return to the previous menu or wait to get a response");
-                timeout = true;
+
+                talkToMain.lock();
+
+                waker = WAKER.TIMEOUT;
+
+                writer.println("aaaa");
             }
         });
         thr.start();
@@ -336,48 +430,62 @@ public class Main {
         boolean no;
         P2PConnection conn;
 
-        while (!timeout && (num_party_nodes < max_party_nodes)) {
-            System.out.println("Waiting for responses, write \"enough\" if you want to move on to creating the party or write \"exit\" to move to the previous menu");
+        talkToMain.unlock();
+        boolean go_p2p = false;
+        while (!go_p2p && (num_party_nodes < max_party_nodes)) {
+            System.out.println(
+                    "Waiting for responses, write \"enough\" if you want to move on to creating the party or write \"exit\" to move to the previous menu");
             input = scanner.nextLine();
 
-            if ((conn = partyAnswers.getWaitingConnection()) == null) {
-                if (timeout && num_party_nodes == 0) {
-                    System.out.println("Returning to the previous menu...");
+            switch (waker) {
+                case CON:
+                    no = !receiveYN(input);
+
+                    partyAnswers.setAnswer(!no);
+        
+                    if (no) {
+                        if (num_party_nodes > 0)
+                            endP2PThread(connectionThreads.get(partyAnswers.getWaitingConnection()));
+        
+                        continue;
+                    }
+        
+                    num_party_nodes++;
+        
+                    connectionThreads.get(partyAnswers.getWaitingConnection()).join();
+        
+                    HostConnection.addMember(partyAnswers.getWaitingConnection());
                     break;
-                }
+                case INPUT:
+                    switch (input) {
+                        case "exit":
+                            /* If there have been no replies, then nothing has changed */
+                            if (num_party_nodes == 0)
+                                return;
 
-                switch (input) {
-                    case "exit":
-                        /* If there have been no replies, then nothing has changed */
-                        if (num_party_nodes == 0) return;
+                            HostConnection.clearMembers();
+                            break;
+                        case "enough":
+                            /** TODO, go to party */
+                            break;
+                        default:
+                            System.out.println("Unrecognised input");
+                            break;
+                    }
+                    break;
+                case TIMEOUT:
+                    System.out.println("The other users are not responding, cancel party?");
+                    if (receiveYN(input)) {
+                        /** TODO, go to party */
+                        return;
+                    }
 
-                        HostConnection.clearMembers();
-                        break;
-                    case "enough":
+                    go_p2p = true;
+                    break;
 
-                        break;
-                    default:
-                        System.out.println("Unrecognised input");
-                        break;
-                }
             }
 
-            no = !receiveYN(input);
-
-            partyAnswers.setWaitingConnection(null);
-            partyAnswers.setAnswer(!no);
-
-            if (no) {
-                if (num_party_nodes > 0) endP2PThread(connectionThreads.get(conn));
-
-                continue;
-            }
-
-            num_party_nodes++;
-
-            connectionThreads.get(conn).join();
-
-            HostConnection.addMember(conn);
+            
         }
 
         /* Close remaining open connections, close threads, etc */
@@ -400,6 +508,7 @@ public class Main {
         String action;
         Boolean exit = false;
 
+        talkToMain.unlock();
         while (exit) {
             System.out.println("You are in a party! You can use either of these commands:"
                     + "- play: if you want to play the music"
@@ -452,6 +561,7 @@ public class Main {
      */
     private boolean receiveYN(String answer) {
         Boolean yes;
+        Scanner stdin = new Scanner(System.in);
 
         yes = processYN(answer);
 
@@ -459,10 +569,12 @@ public class Main {
 
             System.out.println("Error, please write \'yes\' or \'no\'");
 
-            answer = scanner.nextLine();
+            answer = stdin.nextLine();
 
             yes = processYN(answer);
         }
+
+        stdin.close();
 
         return yes;
     }
