@@ -275,6 +275,8 @@ public class Main {
         System.out.println("Name sent to your neighbour");
         thr.join();
         System.out.println("Joined network successfully");
+
+        s.close();
     }
 
     private void startP2PConnections() {
