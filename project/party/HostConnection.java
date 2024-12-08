@@ -2,17 +2,41 @@ package party;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.json.JSONObject;
 
 import main.Main;
 import music_player.Update;
+import p2p.P2PConnection;
 import utils.MessageType;
 import utils.MySocket;
 
 public class HostConnection extends PartyConnection {
+    private static Map<HostConnection, Thread> members = new HashMap<>();
+    public HostConnection(MySocket socket) throws UnknownHostException, IOException {
+        super(null, socket);
+    }
 
-    public HostConnection(String peer, MySocket socket) throws UnknownHostException, IOException {
-        super(peer, socket);
+    /** 
+     * Method that changes the given connection to a host connection and adds it to the map
+     * @param connection the connection to be added to the host
+     * @throws IOException 
+     * @throws UnknownHostException 
+    */
+    public static void addMember(P2PConnection connection) throws UnknownHostException, IOException {
+        members.put(new HostConnection(connection.getSocket()), null);
+    }
+
+    /** 
+     * Method that changes the given connection to a host connection and adds it to the map
+     * @param connection the connection to be added to the host
+     * @throws IOException 
+     * @throws UnknownHostException 
+    */
+    public static void clearMembers() {
+        members.clear();
     }
 
     @Override
@@ -54,17 +78,37 @@ public class HostConnection extends PartyConnection {
         main.getMusicPlayerTask().addChange(update);
     }
 
+    public static void startMembers() {
+        members.replaceAll((conn, thr) -> {
+            if (thr == null) thr = new Thread(conn);
+
+            if (!thr.isAlive() && !conn.isClosed()) thr.start();
+
+            return thr;
+        });
+    }
+
     public static void sendUpdateToMembers(Update update, Main main) {
         JSONObject message = update.createUpdateJSON();
 
         message.put("type", MessageType.EXECUTE_ACTION.toString());
 
         try {
-            main.sendToAllConnections(message);
+            sendToMembers(message);
         } catch (IOException e) {
             e.printStackTrace();
 
             return;
+        }
+    }
+
+    /**
+     * Method that sends the given message to all the member connections
+     * @param message
+     */
+    private static void sendToMembers(JSONObject message) throws IOException {
+        for (HostConnection member: members.keySet()) {
+            member.send(message);
         }
     }
 

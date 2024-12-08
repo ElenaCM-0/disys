@@ -13,6 +13,7 @@ import utils.MySocket;
 import utils.SharedInfo;
 
 public class P2PConnection extends Connection {
+    private static int max_response_time;
 
     public P2PConnection(String peer, MySocket socket) throws UnknownHostException, IOException {
         super(peer, socket);
@@ -126,11 +127,10 @@ public class P2PConnection extends Connection {
         return true;
     }
 
-    public void close() throws IOException {
-        this.socket.close();
-    }
-
-    public boolean isClosed() {
-        return this.socket.isClosed();
+    /**
+     * This method restarts the time counter for the P2P connection class, the one that will keep track of how long the nodes take to respond
+     */
+    public static void restartTime() {
+        max_response_time = 0;
     }
 }

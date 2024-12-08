@@ -13,7 +13,8 @@ import p2p.P2PConnection;
 public class SharedInfo {
     private final Lock lock; // is used to make sure that only one thread at a time can access or modify the answer or waitingConnection
     private Boolean answer;
-    private P2PConnection waitingConnection; // an object that stores some kind of connection or request
+    private P2PConnection waitingConnection; 
+    
 
 
     // this constructor sets up the lock and puts answer and waitingConnection to null (empty)
@@ -64,5 +65,15 @@ public class SharedInfo {
     // updates waitingConnection with a new connection/request
     public void setWaitingConnection(P2PConnection waitingConnection) {
         this.waitingConnection = waitingConnection;
+    }
+
+    
+
+    public enum WAKER {
+        CON, TIMEOUT, INPUT;
+    }
+
+    public enum MAIN_STATE {
+        NONE, EXIT, PARTY;
     }
 }

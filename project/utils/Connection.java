@@ -5,7 +5,7 @@ import java.net.*;
 
 import org.json.JSONObject;
 
-public class Connection implements Runnable {
+public abstract class Connection  implements Runnable{
     protected String peer;
     protected MySocket socket;
 
@@ -64,45 +64,20 @@ public class Connection implements Runnable {
         socket.send(message);
     }
 
-    /**
-     * When this method is called, a new thread will listen in on the messages sent
-     * through this connection,
-     * dealing with them as they are received
-     */
-    @Override
-    public void run() {
-        JSONObject message;
-
-        try {
-            while ((message = socket.receive()) != null) {
-                switch (message.getString("type")) {
-                    case "request_message": {
-
-                        /* Show the message to the user */
-                    }
-                    default: {
-                        /* Malformed message, discard */
-                        continue;
-                    }
-                }
-
-            }
-
-            return;
-        } catch (IOException e) {
-            e.printStackTrace();
-
-            return;
-        }
-
-    }
-
     public String getPeer() {
         return peer;
     }
 
     public MySocket getSocket() {
         return socket;
+    }
+
+    public void close() throws IOException {
+        this.socket.close();
+    }
+
+    public boolean isClosed() {
+        return this.socket.isClosed();
     }
 
 }

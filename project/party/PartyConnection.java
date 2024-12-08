@@ -7,7 +7,7 @@ import java.net.UnknownHostException;
 import utils.Connection;
 import utils.MySocket;
 
-public abstract class PartyConnection extends Connection {
+public abstract class PartyConnection extends Connection{
 
     public PartyConnection(String peer, String ip, int port) throws UnknownHostException, IOException {
         super(peer, ip, port);
