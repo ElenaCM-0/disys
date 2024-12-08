@@ -14,7 +14,7 @@ public enum Action {
         if (newSong == null) {
             return null;
         }
-        return new PlayerStatus(new SongInstant(newSong, Duration.ZERO), mp.getStatus());
+        return new PlayerStatus(new SongInstant(newSong, Duration.ZERO), pst.getStatus());
     }),
     PAUSE("pause", (_, pst) -> new PlayerStatus(pst.getInstant(), Status.PAUSED)),
     BACK("backward", (mp, pst) -> {
@@ -22,7 +22,7 @@ public enum Action {
         if (newSong == null) {
             return null;
         }
-        return new PlayerStatus(new SongInstant(newSong, Duration.ZERO), mp.getStatus());
+        return new PlayerStatus(new SongInstant(newSong, Duration.ZERO), pst.getStatus());
     });
 
     private String command;

@@ -38,6 +38,8 @@ public class MusicPlayer {
                 if (this.currentIndex < this.songs.size() - 1) {
                     // Create player for next song and start playing it
                     this.currentIndex++;
+                    this.player.stop();
+                    this.player.dispose();
                     this.player = this.createPlayer(this.songs.get(this.currentIndex));
                     this.player.play();
                 } else {
@@ -55,11 +57,19 @@ public class MusicPlayer {
      * Constructor. Initializes a player for the first song.
      * 
      * @param songs initial list of songs' names
-     * @throws SongNotFoundException if the first song of the list can not be found
      */
-    public MusicPlayer(List<String> songs) throws SongNotFoundException {
+    public MusicPlayer(List<String> songs) {
         this.songs = songs;
-        this.player = createPlayer(songs.getFirst());
+    }
+
+    public void start() throws SongNotFoundException {
+        this.player = this.createPlayer(this.songs.getFirst());
+    }
+
+    public void stop() {
+        this.player.stop();
+        this.player.dispose();
+        Platform.exit();
     }
 
     /**

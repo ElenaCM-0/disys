@@ -79,27 +79,31 @@ public class MusicPlayerTask implements Runnable {
      *               change
      */
     public void addChange(Update update) {
-        this.updates.add(update);
         long executionTime = update.getExecutionTime();
         PlayerStatus newStatus = new PlayerStatus(update.geSongInstant(), update.getStatus());
         // We don't have to do anything if there is no actual update
         if (this.getStatus(executionTime).equals(newStatus)) {
+            this.updates.add(update);
             return;
         }
-
+        this.updates.add(update);
         // Schedule update
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         long delayInMillis = executionTime - Instant.now().toEpochMilli();
         // Programa la tarea
         scheduler.schedule(() -> {
             this.mp.update(newStatus);
+            scheduler.shutdown();
         }, delayInMillis, TimeUnit.MILLISECONDS);
 
     }
 
     @Override
     public void run() {
-        Platform.startup(() -> this.mp.play());
+        Platform.startup(() -> {
+            this.mp.start();
+            this.mp.play();
+        });
     }
 
     // Example about how to implement doing an action in a certain UTC time. I
