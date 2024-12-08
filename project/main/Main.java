@@ -276,7 +276,7 @@ public class Main {
         thr.join();
         System.out.println("Joined network successfully");
 
-        s.close();
+
     }
 
     private void startP2PConnections() {
@@ -709,9 +709,12 @@ public class Main {
         }
         System.out.println("\nType the name of the song you want to add to the party.");
         System.out.println("When you're done, type 'done'.\n");
+        requestProcessed = true;
+
         while (true) {
             System.out.print("Enter a song: ");
             String input = scanner.nextLine();
+            requestProcessed = true;
             if (input.equalsIgnoreCase("done")) {
                 break;
             } else if (availableSongs.contains(input)) {
