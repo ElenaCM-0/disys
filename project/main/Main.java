@@ -113,7 +113,7 @@ public class Main {
     }
 
     public enum MAIN_STATUS {
-        P2P, EXIT, JOIN, HOST;
+        P2P, EXIT, JOIN, HOST, PARTY;
     }
 
     private WAKER waker;
@@ -325,36 +325,63 @@ public class Main {
          * -Create a music player and a music player thread and execute
          * -Create heartbeat thread
          */
-        boolean partyStarted = false;
-        Thread thr;
-        Long partyTime = hostConnection.waitForMessage(1000);
-        if (partyTime != null) {
-            partyStarted = true;
-            for (Connection c : this.connectionThreads.keySet()) {
 
-                if (!c.equals(hostConnection)) {
-                    thr = connectionThreads.get(c);
-                    thr.interrupt();
-                    thr.join();
-
-                }
+        /* Set thread timeout to avoid waiting forever */
+        Thread thr = new Thread(() -> {
+            try {
+                Thread.sleep(TIMEOUT * 1000);
+            } catch (InterruptedException e) {
+                return;
             }
-            partyConnection = new MemberConnection(hostConnection);
-            partyConnectionThread = new Thread(this.partyConnection);
-            partyConnectionThread.start();
-            // TODO Get time when the party starts
-            // musicPlayerTask.start(startTime);
-            heartbeat = new MemberHeartbeat();
-            heartbeatThread = new Thread(heartbeat);
-            heartbeatThread.start();
-            // TODO (ElenaRG) Set to true partyStarted if you have been accepted
-            playingPartyMenu();
-            // Connnections with other peers are reopened so new requests can be listened
-            // after a party
-        } else {
+
+            if (status == MAIN_STATUS.JOIN) {
+
+                talkToMain.lock();
+
+                waker = WAKER.TIMEOUT;
+
+                writer.println("aaaa");
+            }
+        });
+        thr.start();
+
+        String partyTime = scanner.nextLine();
+
+        if (waker == WAKER.TIMEOUT) {
             System.out.println("The host didn't accept you, going back to the menu...");
-            p2pmenu();
+            
+            return;
         }
+
+        status = MAIN_STATUS.PARTY;
+
+        talkToMain.unlock();
+
+        Thread t;
+        
+        for (Connection c : this.connectionThreads.keySet()) {
+
+            if (!c.equals(hostConnection)) {
+                t = connectionThreads.get(c);
+                t.interrupt();
+                t.join();
+
+            }
+        }
+
+        partyConnection = new MemberConnection(hostConnection);
+        partyConnectionThread = new Thread(this.partyConnection);
+        partyConnectionThread.start();
+        
+        musicPlayerTask.start(Long.valueOf(partyTime));
+
+        heartbeat = new MemberHeartbeat();
+        heartbeatThread = new Thread(heartbeat);
+        heartbeatThread.start();
+        // TODO (ElenaRG) Set to true partyStarted if you have been accepted
+        playingPartyMenu();
+        // Connnections with other peers are reopened so new requests can be listened
+        // after a party
     }
 
     /**

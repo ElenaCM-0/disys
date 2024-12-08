@@ -165,7 +165,6 @@ public class P2PConnection extends Connection {
         if (party_time != null) {
             return party_time;
         }
-        socket.setSoTimeout(timeout);
         try {
             JSONObject answer = socket.receive();
             Long time = answer.getLong("time");
