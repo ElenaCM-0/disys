@@ -42,8 +42,8 @@ public class P2PConnection extends Connection {
 
                 switch (type) {
                     case PARTY_REQUEST:
-                        if (processPartyRequest(message))
-                            return;
+                        processPartyRequest(message);
+
                         break;
                     case PARTY_RESPONSE:
                         if (processPartyResponse())
@@ -71,7 +71,7 @@ public class P2PConnection extends Connection {
      * @return true if the thread should finish execution after calling the method,
      *         false otherwise
      */
-    private boolean processPartyRequest(JSONObject message) {
+    private void processPartyRequest(JSONObject message) {
         Main main = Main.getInstance();
 
         SharedInfo request = main.getRequest();
@@ -83,7 +83,7 @@ public class P2PConnection extends Connection {
 
         if (main.getStatus() != Main.MAIN_STATUS.P2P) {
             main.releaseMain();
-            return false;
+            return;
         }
 
         request.setWaitingConnection(this);
@@ -100,7 +100,7 @@ public class P2PConnection extends Connection {
         request.releaseLock();
 
         if (answer == false)
-            return false;
+            return;
 
         int num_songs = message.getInt("num_songs");
 
@@ -112,7 +112,7 @@ public class P2PConnection extends Connection {
 
         main.addPartySongs(song_list);
 
-        return true;
+        return;
     }
 
     /**
