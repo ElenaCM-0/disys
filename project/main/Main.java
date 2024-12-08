@@ -230,7 +230,7 @@ public class Main {
         Scanner s = new Scanner(System.in);
         // configuration of the net:
         System.out.println("Write your IP address");
-        String myIP = scanner.nextLine();
+        String myIP = s.nextLine();
 
         System.out.println("Your IP address is: " + myIP + " Share it with one of the nodes."); // how do we control
                                                                                                 // which one?
