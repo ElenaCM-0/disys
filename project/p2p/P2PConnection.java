@@ -35,6 +35,10 @@ public class P2PConnection extends Connection {
                 // Receive message
                 JSONObject message = socket.receive();
 
+                if (message == null) {
+                    return;
+                }
+
                 MessageType type = MessageType.match(message.getString("type"));
 
                 switch (type) {
@@ -57,6 +61,8 @@ public class P2PConnection extends Connection {
                 }
 
             }
+        } catch (InterruptedException e) {
+            return;
         } catch (IOException e) {
             e.printStackTrace();
         }
