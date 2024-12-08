@@ -140,4 +140,9 @@ public class MySocket {
     public boolean isClosed() {
         return this.tunnel.isClosed();
     }
+
+    public void setSoTimeout(int timeout) throws SocketException {
+        this.tunnel.setSoTimeout(timeout);
+    }
+
 }

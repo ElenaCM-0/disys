@@ -45,6 +45,11 @@ public class P2PConnection extends Connection {
                             return;
 
                         break;
+                    case START_PARTY:
+                        if (processStartParty())
+                            return;
+                        break;
+                        
                     default:
                         break;
                 }
@@ -132,6 +137,10 @@ public class P2PConnection extends Connection {
             max_response_time = sent_time;
         }
 
+        return true;
+    }
+
+    private boolean processStartParty(){
         return true;
     }
 

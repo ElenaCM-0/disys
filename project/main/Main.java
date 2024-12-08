@@ -341,6 +341,7 @@ public class Main {
          */
         boolean partyStarted = false;
         Thread thr;
+        partyStarted=hostConnection.waitForMessage(1000);
         for (Connection c : this.connectionThreads.keySet()) {
 
             if (!c.equals(hostConnection)) {

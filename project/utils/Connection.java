@@ -80,4 +80,15 @@ public abstract class Connection  implements Runnable{
         return this.socket.isClosed();
     }
 
+    public boolean waitForMessage(int timeout) throws IOException {
+        socket.setSoTimeout(timeout);
+        try {
+            JSONObject answer= socket.receive();
+            return true;
+        } catch (SocketTimeoutException e) {
+            System.out.println("Timeout");
+            return false;
+        }
+    }
+
 }
