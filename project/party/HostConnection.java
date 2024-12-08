@@ -57,6 +57,8 @@ public class HostConnection extends PartyConnection {
             }
 
             return;
+        } catch (InterruptedException e) {
+            return;
         } catch (IOException e) {
             e.printStackTrace();
 
