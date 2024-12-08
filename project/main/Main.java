@@ -504,6 +504,8 @@ public class Main {
 
         HostConnection.startMembers();
 
+        HostConnection.sendStartParty(getNearestChange());
+
         playingPartyMenu();
     }
 
@@ -689,9 +691,8 @@ public class Main {
      *         have time to take all of
      *         the actions
      */
-    private int getMilisec() {
-        /** TODO **/
-        return 0;
+    private long getMilisec() {
+        return P2PConnection.getMaxTime();
     }
 
     /**
@@ -714,23 +715,6 @@ public class Main {
 
     public Heartbeat getHeartbeat() {
         return heartbeat;
-    }
-
-    /**
-     * @return The host variable, null if the main has not processed the user's
-     *         answer, true if the user is trying to host a playing party, false
-     *         otherwise
-     */
-    public Boolean getHost() {
-        return host;
-    }
-
-    /**
-     * @return The userInput variable, true if the user has written something, false
-     *         otherwise
-     */
-    public boolean getInput() {
-        return userInput;
     }
 
     /**

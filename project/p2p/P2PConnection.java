@@ -144,6 +144,10 @@ public class P2PConnection extends Connection {
         return true;
     }
 
+    public static long getMaxTime() {
+        return max_response_time;
+    }
+
     /**
      * This method restarts the time counter for the P2P connection class, the one that will keep track of how long the nodes take to respond
      */
