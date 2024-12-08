@@ -319,7 +319,7 @@ public class Main {
         }
     }
 
-    private void joinParty(Connection hostConnection) throws UnknownHostException, IOException, InterruptedException {
+    private void joinParty(P2PConnection hostConnection) throws UnknownHostException, IOException, InterruptedException {
         // TODO Do all necessary things to join a party
         /*
          * -Close useless connections
