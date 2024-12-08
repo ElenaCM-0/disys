@@ -140,6 +140,8 @@ public class Main {
     public void requestMain() {
         talkToMain.lock();
 
+        requestProcessed = false;
+
         waker = WAKER.CON;
     }
 
@@ -147,6 +149,8 @@ public class Main {
      * Method that will free the lock to talk to the main
      */
     public void releaseMain() {
+        while (!requestProcessed) Thread.sleep(100);
+
         talkToMain.unlock();
     }
 
@@ -337,10 +341,14 @@ public class Main {
             if (status == MAIN_STATUS.JOIN) {
 
                 talkToMain.lock();
+                requestProcessed = false;
 
                 waker = WAKER.TIMEOUT;
 
                 writer.println("aaaa");
+
+                while (!requestProcessed) Thread.sleep(100);
+                talkToMain.unlock();
             }
         });
         thr.start();
@@ -436,10 +444,15 @@ public class Main {
             if (num_party_nodes == 0) {
 
                 talkToMain.lock();
+                requestProcessed = false;
 
                 waker = WAKER.TIMEOUT;
 
                 writer.println("aaaa");
+
+                while (!requestProcessed) Thread.sleep(100);
+
+                talkToMain.unlock();
             }
         });
         thr.start();
