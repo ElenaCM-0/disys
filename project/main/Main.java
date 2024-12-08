@@ -341,7 +341,9 @@ public class Main {
          */
         boolean partyStarted = false;
         Thread thr;
-        partyStarted=hostConnection.waitForMessage(1000);
+        Long partyTime=hostConnection.waitForMessage(1000);
+        if (partyTime!=null){
+            partyStarted=true;
         for (Connection c : this.connectionThreads.keySet()) {
 
             if (!c.equals(hostConnection)) {
@@ -360,12 +362,14 @@ public class Main {
         heartbeat = new MemberHeartbeat();
         heartbeatThread = new Thread(heartbeat);
         heartbeatThread.start();
-
         // TODO (ElenaRG) Set to true partyStarted if you have been accepted
-        if (partyStarted) {
-            playingPartyMenu();
+        playingPartyMenu();
             // Connnections with other peers are reopened so new requests can be listened
             // after a party
+        }
+        else{
+            System.out.println("The host didn't accept you, going back to the menu...");
+            p2pmenu();
         }
     }
 
