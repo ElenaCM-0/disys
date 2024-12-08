@@ -40,7 +40,6 @@ public class Main {
 
     private static Main instance = null;
     private Thread heartbeatThread;
-    private Thread musicPlayerThread;
     private Heartbeat heartbeat;
     private boolean delayedHeartbeat = false;
     private MusicPlayerTask musicPlayerTask;
@@ -138,7 +137,7 @@ public class Main {
     /**
      * Method that will wait on the lock to talk to the main
      */
-    public void requestMain(){
+    public void requestMain() {
         talkToMain.lock();
 
         waker = WAKER.CON;
@@ -147,7 +146,7 @@ public class Main {
     /**
      * Method that will free the lock to talk to the main
      */
-    public void releaseMain(){
+    public void releaseMain() {
         talkToMain.unlock();
     }
 
@@ -158,8 +157,6 @@ public class Main {
     public MAIN_STATUS getStatus() {
         return status;
     }
-
-    
 
     public static void main(String[] args) throws UnknownHostException, IOException, InterruptedException {
         Main main = Main.getInstance();
@@ -192,15 +189,6 @@ public class Main {
             endP2PThread(e.getValue());
 
             conn.close();
-        }
-
-        if (musicPlayerThread != null) {
-            if (musicPlayerThread.isAlive()) {
-                musicPlayerThread.interrupt();
-
-            }
-            musicPlayerThread.join();
-
         }
         if (heartbeatThread != null) {
             if (heartbeatThread.isAlive()) {
@@ -341,33 +329,31 @@ public class Main {
          */
         boolean partyStarted = false;
         Thread thr;
-        Long partyTime=hostConnection.waitForMessage(1000);
-        if (partyTime!=null){
-            partyStarted=true;
-        for (Connection c : this.connectionThreads.keySet()) {
+        Long partyTime = hostConnection.waitForMessage(1000);
+        if (partyTime != null) {
+            partyStarted = true;
+            for (Connection c : this.connectionThreads.keySet()) {
 
-            if (!c.equals(hostConnection)) {
-                thr = connectionThreads.get(c);
-                thr.interrupt();
-                thr.join();
+                if (!c.equals(hostConnection)) {
+                    thr = connectionThreads.get(c);
+                    thr.interrupt();
+                    thr.join();
 
+                }
             }
-        }
-        partyConnection = new MemberConnection(hostConnection);
-        partyConnectionThread = new Thread(this.partyConnection);
-        partyConnectionThread.start();
-
-        musicPlayerThread = new Thread(musicPlayerTask);
-        musicPlayerThread.start();
-        heartbeat = new MemberHeartbeat();
-        heartbeatThread = new Thread(heartbeat);
-        heartbeatThread.start();
-        // TODO (ElenaRG) Set to true partyStarted if you have been accepted
-        playingPartyMenu();
+            partyConnection = new MemberConnection(hostConnection);
+            partyConnectionThread = new Thread(this.partyConnection);
+            partyConnectionThread.start();
+            // TODO Get time when the party starts
+            // musicPlayerTask.start(startTime);
+            heartbeat = new MemberHeartbeat();
+            heartbeatThread = new Thread(heartbeat);
+            heartbeatThread.start();
+            // TODO (ElenaRG) Set to true partyStarted if you have been accepted
+            playingPartyMenu();
             // Connnections with other peers are reopened so new requests can be listened
             // after a party
-        }
-        else{
+        } else {
             System.out.println("The host didn't accept you, going back to the menu...");
             p2pmenu();
         }
@@ -439,7 +425,7 @@ public class Main {
         talkToMain.unlock();
 
         boolean exit = false;
-        
+
         while (!exit && num_party_nodes < max_party_nodes) {
             System.out.println(
                     "Waiting for responses, write \"enough\" if you want to move on to creating the party or write \"exit\" to move to the previous menu");
@@ -450,18 +436,18 @@ public class Main {
                     no = !receiveYN(input);
 
                     partyAnswers.setAnswer(!no);
-        
+
                     if (no) {
                         if (num_party_nodes > 0)
                             endP2PThread(connectionThreads.get(partyAnswers.getWaitingConnection()));
-        
+
                         continue;
                     }
-        
+
                     num_party_nodes++;
-        
+
                     connectionThreads.get(partyAnswers.getWaitingConnection()).join();
-        
+
                     HostConnection.addMember(partyAnswers.getWaitingConnection());
                     break;
                 case INPUT:
@@ -502,7 +488,7 @@ public class Main {
             try {
                 endP2PThread(t);
             } catch (InterruptedException e) {
-                
+
             }
         });
 

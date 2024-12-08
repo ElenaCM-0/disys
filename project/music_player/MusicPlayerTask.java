@@ -13,7 +13,7 @@ import javafx.application.Platform;
 import party.Action;
 import utils.SongInstant;
 
-public class MusicPlayerTask implements Runnable {
+public class MusicPlayerTask {
 
     private MusicPlayer mp;
     private List<Update> updates = new ArrayList<>();
@@ -109,12 +109,17 @@ public class MusicPlayerTask implements Runnable {
         return newUpdate;
     }
 
-    @Override
-    public void run() {
-        Platform.startup(() -> {
-            this.mp.start();
-            this.mp.play();
-        });
+    public void start(long executionTime) {
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        long delayInMillis = executionTime - Instant.now().toEpochMilli();
+        // Programa la tarea
+        scheduler.schedule(() -> {
+            Platform.startup(() -> {
+                this.mp.start();
+                this.mp.play();
+                scheduler.shutdown();
+            });
+        }, delayInMillis, TimeUnit.MILLISECONDS);
     }
 
     // Example about how to implement doing an action in a certain UTC time. I
