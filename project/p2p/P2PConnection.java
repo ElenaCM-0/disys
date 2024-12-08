@@ -43,6 +43,11 @@ public class P2PConnection extends Connection {
                             return;
 
                         break;
+                    case START_PARTY:
+                        if (processStartParty())
+                            return;
+                        break;
+                        
                     default:
                         break;
                 }
@@ -124,6 +129,10 @@ public class P2PConnection extends Connection {
 
         main.askUser(peer + " wants to join your party, accept?");
 
+        return true;
+    }
+
+    private boolean processStartParty(){
         return true;
     }
 
