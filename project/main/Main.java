@@ -181,9 +181,9 @@ public class Main {
     public static void main(String[] args) throws UnknownHostException, IOException, InterruptedException {
         Main main = Main.getInstance();
 
-        main.userInput.start();
-
         main.joinNetwork();
+
+        main.userInput.start();
 
         // implement here part to connect to a party or start a party
         main.p2pmenu();
