@@ -63,6 +63,19 @@ public class Main {
 
     private int num_party_nodes;
 
+    /**
+     * Function that will return only when requestProcessed is true
+     */
+    private void waitForMain() {
+        while (!requestProcessed){
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                continue;
+            }
+        }
+    }
+
     private Main() throws IOException {
         PipedInputStream pipedInput = new PipedInputStream();
         pipedOutput = new PipedOutputStream(pipedInput);
@@ -70,12 +83,24 @@ public class Main {
 
         scanner = new Scanner(pipedInput);
 
+        PipedInputStream pipedStdin = new PipedInputStream();
+        pipedStdinOutput = new PipedOutputStream(pipedStdin);
+        stdinWriter = new PrintWriter(pipedStdinOutput, true);
+
+        stdin = new Scanner(pipedStdin);
+
         userInput = new Thread(() -> {
-            Scanner stdin = new Scanner(System.in);
+            Scanner stdin_real = new Scanner(System.in);
             String input;
             MAIN_STATUS status_before;
-            while ((input = stdin.nextLine()) != null) {
+            while ((input = stdin_real.nextLine()) != null) {
                 status_before = status;
+
+                if (status_before == MAIN_STATUS.YN) {
+                    stdinWriter.println(input);
+                    continue;
+                }
+
                 talkToMain.lock();
 
                 if (status_before != status) {
@@ -86,18 +111,12 @@ public class Main {
                 waker = WAKER.INPUT;
                 writer.println(input);
 
-                while (!requestProcessed){
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        continue;
-                    }
-                }
+                waitForMain();
                     
                 talkToMain.unlock();
             }
 
-            stdin.close();
+            stdin_real.close();
         });
     }
 
@@ -119,11 +138,11 @@ public class Main {
      * @throws InterruptedException
      *******************************************************************************************/
     public enum WAKER {
-        CON, TIMEOUT, INPUT;
+        CON, TIMEOUT, INPUT, HEART;
     }
 
     public enum MAIN_STATUS {
-        P2P, EXIT, JOIN, HOST, PARTY;
+        P2P, EXIT, JOIN, HOST, PARTY, YN;
     }
 
     private WAKER waker;
@@ -132,6 +151,9 @@ public class Main {
     private Thread userInput;
 
     private Scanner scanner = null;
+    private Scanner stdin = null;
+    private PrintWriter stdinWriter;
+    private PipedOutputStream pipedStdinOutput;
     private PrintWriter writer;
     private PipedOutputStream pipedOutput;
     private boolean requestProcessed;
@@ -160,12 +182,7 @@ public class Main {
      * Method that will free the lock to talk to the main
      */
     public void releaseMain() {
-        while (!requestProcessed)
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                continue;
-            }
+        waitForMain();
 
         talkToMain.unlock();
     }
@@ -181,9 +198,9 @@ public class Main {
     public static void main(String[] args) throws UnknownHostException, IOException, InterruptedException {
         Main main = Main.getInstance();
 
-        main.joinNetwork();
-
         main.userInput.start();
+
+        main.joinNetwork();
 
         // implement here part to connect to a party or start a party
         main.p2pmenu();
@@ -219,27 +236,31 @@ public class Main {
 
         try {
             pipedOutput.close();
+            pipedStdinOutput.close();
         } catch (IOException e) {
 
         } finally {
             writer.close();
+            stdinWriter.close();
         }
     }
 
     private void joinNetwork() throws UnknownHostException, IOException, InterruptedException {
-        Scanner s = new Scanner(System.in);
+        status = MAIN_STATUS.YN;
+
         // configuration of the net:
         System.out.println("Write your IP address");
-        String myIP = s.nextLine();
+        String myIP = stdin.nextLine();
 
         System.out.println("Your IP address is: " + myIP + " Share it with one of the nodes."); // how do we control
                                                                                                 // which one?
         System.out.println("Write the IP address of the node next to you: ");
-        String ipNeighbour = s.nextLine();
+        String ipNeighbour = stdin.nextLine();
         System.out.println("Write the user name of the node next to you: ");
-        String userNeighbour = s.nextLine();
+        String userNeighbour = stdin.nextLine();
 
         ServerSocket serverSocket = new ServerSocket(PORT);
+        
         Thread thr = new Thread(() -> {
             try {
                 MySocket connectedSocket = new MySocket(serverSocket.accept());
@@ -257,7 +278,7 @@ public class Main {
         });
         thr.start();
         System.out.println("Server socket created, press ENTER to move to the next step");
-        s.nextLine();
+        stdin.nextLine();
 
         P2PConnection nbConnection = new P2PConnection(userNeighbour, ipNeighbour, PORT);
 
@@ -267,7 +288,7 @@ public class Main {
 
         /* Send the node's name to the neighbour */
         System.out.println("Write the user name to send to your neighbour: ");
-        userNeighbour = s.nextLine();
+        userNeighbour = stdin.nextLine();
 
         message.put("user", userNeighbour);
 
@@ -275,8 +296,6 @@ public class Main {
         System.out.println("Name sent to your neighbour");
         thr.join();
         System.out.println("Joined network successfully");
-
-
     }
 
     private void startP2PConnections() {
@@ -306,7 +325,7 @@ public class Main {
                 case WAKER.CON:
                     System.out.println(input);
 
-                    boolean yes = receiveYN("");
+                    boolean yes = receiveYN();
                     partyRequests.setAnswer(yes);
 
                     if (yes) {
@@ -371,13 +390,7 @@ public class Main {
 
                 writer.println("aaaa");
 
-                while (!requestProcessed){
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        continue;
-                    }
-                }
+                waitForMain();
                     
                 talkToMain.unlock();
             }
@@ -480,13 +493,7 @@ public class Main {
 
                 writer.println("aaaa");
 
-                while (!requestProcessed){
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        continue;
-                    }
-                }
+                waitForMain();
 
                 talkToMain.unlock();
             }
@@ -514,7 +521,9 @@ public class Main {
                     if (no) {
                         if (num_party_nodes > 0)
                             endP2PThread(connectionThreads.get(partyAnswers.getWaitingConnection()));
+                        
 
+                        requestProcessed = true;
                         continue;
                     }
 
@@ -551,7 +560,8 @@ public class Main {
                     }
 
                     exit = true;
-
+                default:
+                    break;
             }
 
             requestProcessed = true;
@@ -589,29 +599,38 @@ public class Main {
         String action;
         Boolean exit = false;
 
-        requestProcessed = true;
+        status = MAIN_STATUS.PARTY;
         while (!exit) {
+            requestProcessed = true;
+
             System.out.println("You are in a party! You can use either of these commands:"
-                    + "- play: if you want to play the music"
-                    + "- pause: if you want to stop the song"
-                    + "- forward: if you want to skip to the next song"
-                    + "- backward: if you want to go back to the previous song"
-                    + "- exit: if you want to disconnect from the playing party"
-                    + "Note: if your request is not posible to execute (f.e you skip and it is the last song), your request will be ignored");
+                    + "\n- play: if you want to play the music"
+                    + "\n- pause: if you want to stop the song"
+                    + "\n- forward: if you want to skip to the next song"
+                    + "\n- backward: if you want to go back to the previous song"
+                    + "\n- exit: if you want to disconnect from the playing party"
+                    + "\nNote: if your request is not posible to execute (f.e you skip and it is the last song), your request will be ignored");
 
             action = scanner.nextLine();
+
+            switch (waker) {
+                case HEART:
+                    System.out.println(action);
+                    if (!receiveYN())
+                        return;
+
+                    continue;
+                case INPUT:
+                    break;
+                default:
+                    continue;
+            }
 
             if (action.equals("exit")) {
                 exit = true;
                 continue;
             }
 
-            if (delayedHeartbeat) {
-                if (!receiveYN())
-                    return;
-
-                continue;
-            }
             Action matchedAction = Action.match(action);
 
             if (matchedAction == null) {
@@ -642,9 +661,12 @@ public class Main {
      */
     private boolean receiveYN() {
         Boolean yes = null;
-        Scanner stdin = new Scanner(System.in);
 
         String answer;
+
+        MAIN_STATUS prevStatus = status;
+
+        status = MAIN_STATUS.YN;
 
         while (yes == null) {
 
@@ -656,7 +678,7 @@ public class Main {
                 System.out.println("Error, please write \'yes\' or \'no\'");
         }
 
-        stdin.close();
+        status = prevStatus;
 
         return yes;
     }
@@ -750,9 +772,15 @@ public class Main {
      * thread has not heard form the host in too long
      */
     public void notHeardFromHost() {
-        delayedHeartbeat = true;
+        talkToMain.lock();
 
-        System.out.println("Disconnected from the host, continue playing party? (Y/N)");
+        waker = WAKER.HEART;
+
+        writer.println("Disconnected from the host, continue playing party? (Y/N)");
+        
+        waitForMain();
+
+        talkToMain.unlock();
     }
 
     /**
