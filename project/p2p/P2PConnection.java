@@ -70,8 +70,9 @@ public class P2PConnection extends Connection {
     /**
      * @return true if the thread should finish execution after calling the method,
      *         false otherwise
+     * @throws IOException
      */
-    private void processPartyRequest(JSONObject message) {
+    private void processPartyRequest(JSONObject message) throws IOException {
         Main main = Main.getInstance();
 
         SharedInfo request = main.getRequest();
@@ -88,9 +89,9 @@ public class P2PConnection extends Connection {
 
         request.setWaitingConnection(this);
 
-        main.askUser(peer + " is hosting a playin party, do you want to join?");
-
         request.setAnswer(null);
+
+        main.askUser(peer + " is hosting a playin party, do you want to join?");
 
         Boolean answer;
 
@@ -101,6 +102,10 @@ public class P2PConnection extends Connection {
 
         if (answer == false)
             return;
+
+        message = new JSONObject();
+        message.put("type", MessageType.PARTY_RESPONSE.toString());
+        send(message);
 
         int num_songs = message.getInt("num_songs");
 

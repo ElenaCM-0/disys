@@ -68,7 +68,7 @@ public class Main {
      * Function that will return only when requestProcessed is true
      */
     private void waitForMain() {
-        while (!requestProcessed){
+        while (!requestProcessed) {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
@@ -106,9 +106,8 @@ public class Main {
                 yn = false;
 
                 try {
-                    while (! talkToMain.tryLock(100, TimeUnit.MILLISECONDS)) {
+                    while (!talkToMain.tryLock(100, TimeUnit.MILLISECONDS)) {
                         if (status == MAIN_STATUS.YN) {
-                            stdinWriter.println(input);
                             yn = true;
                             break;
                         }
@@ -117,8 +116,8 @@ public class Main {
                     break;
                 }
 
-                if (yn) continue;
-
+                if (yn)
+                    continue;
 
                 if (status_before != status) {
                     /* There have been changes in the main before the input was processed */
@@ -129,7 +128,7 @@ public class Main {
                 writer.println(input);
 
                 waitForMain();
-                    
+
                 talkToMain.unlock();
             }
 
@@ -277,7 +276,7 @@ public class Main {
         String userNeighbour = stdin.nextLine();
 
         ServerSocket serverSocket = new ServerSocket(PORT);
-        
+
         Thread thr = new Thread(() -> {
             try {
                 MySocket connectedSocket = new MySocket(serverSocket.accept());
@@ -408,7 +407,7 @@ public class Main {
                 writer.println("aaaa");
 
                 waitForMain();
-                    
+
                 talkToMain.unlock();
             }
         });
@@ -538,7 +537,6 @@ public class Main {
                     if (no) {
                         if (num_party_nodes > 0)
                             endP2PThread(connectionThreads.get(partyAnswers.getWaitingConnection()));
-                        
 
                         requestProcessed = true;
                         continue;
@@ -560,7 +558,7 @@ public class Main {
                             HostConnection.clearMembers();
 
                             System.out.println("Exiting...");
-                            
+
                             return;
                         case "enough":
                             exit = true;
@@ -794,7 +792,7 @@ public class Main {
         waker = WAKER.HEART;
 
         writer.println("Disconnected from the host, continue playing party? (Y/N)");
-        
+
         waitForMain();
 
         talkToMain.unlock();
