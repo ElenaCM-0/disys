@@ -129,9 +129,9 @@ public class P2PConnection extends Connection {
 
         Main main = Main.getInstance();
 
-        SharedInfo answer = main.getResponse();
-
-        answer.acquireLock();
+        // SharedInfo answer = main.getResponse();
+        //
+        // answer.acquireLock();
 
         main.requestMain();
 
@@ -140,9 +140,9 @@ public class P2PConnection extends Connection {
             return false;
         }
 
-        answer.setWaitingConnection(this);
-
-        answer.setAnswer(null);
+        // answer.setWaitingConnection(this);
+        //
+        // answer.setAnswer(null);
 
         main.askUser(peer + " wants to join your party, accept?");
 

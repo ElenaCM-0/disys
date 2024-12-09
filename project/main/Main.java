@@ -530,6 +530,7 @@ public class Main {
 
             switch (waker) {
                 case CON:
+                    System.out.println(input);
                     no = !receiveYN();
 
                     partyAnswers.setAnswer(!no);
