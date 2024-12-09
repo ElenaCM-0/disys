@@ -25,6 +25,7 @@ import java.time.*;
 import org.json.JSONObject;
 
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.ArrayList;
@@ -93,15 +94,31 @@ public class Main {
             Scanner stdin_real = new Scanner(System.in);
             String input;
             MAIN_STATUS status_before;
-            while ((input = stdin_real.nextLine()) != null) {
-                status_before = status;
+            Boolean yn;
 
-                if (status_before == MAIN_STATUS.YN) {
+            while ((input = stdin_real.nextLine()) != null) {
+                if (status == MAIN_STATUS.YN) {
                     stdinWriter.println(input);
                     continue;
                 }
 
-                talkToMain.lock();
+                status_before = status;
+                yn = false;
+
+                try {
+                    while (! talkToMain.tryLock(100, TimeUnit.MILLISECONDS)) {
+                        if (status == MAIN_STATUS.YN) {
+                            stdinWriter.println(input);
+                            yn = true;
+                            break;
+                        }
+                    }
+                } catch (InterruptedException e) {
+                    break;
+                }
+
+                if (yn) continue;
+
 
                 if (status_before != status) {
                     /* There have been changes in the main before the input was processed */
