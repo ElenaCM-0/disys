@@ -103,9 +103,9 @@ public class P2PConnection extends Connection {
         if (answer == false)
             return;
 
-        message = new JSONObject();
-        message.put("type", MessageType.PARTY_RESPONSE.toString());
-        send(message);
+        JSONObject newMessage = new JSONObject();
+        newMessage.put("type", MessageType.PARTY_RESPONSE.toString());
+        send(newMessage);
 
         int num_songs = message.getInt("num_songs");
 
