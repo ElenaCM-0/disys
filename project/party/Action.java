@@ -8,7 +8,7 @@ import music_player.Status;
 import utils.SongInstant;
 
 public enum Action {
-    PLAY("play", (_, pst) -> new PlayerStatus(pst.getInstant(), Status.PLAYING)),
+    PLAY("play", (c, pst) -> new PlayerStatus(pst.getInstant(), Status.PLAYING)),
     SKIP("forward", (mp, pst) -> {
         String newSong = mp.getnextSong(pst.getInstant().getSong());
         if (newSong == null) {
@@ -16,7 +16,7 @@ public enum Action {
         }
         return new PlayerStatus(new SongInstant(newSong, Duration.ZERO), pst.getStatus());
     }),
-    PAUSE("pause", (_, pst) -> new PlayerStatus(pst.getInstant(), Status.PAUSED)),
+    PAUSE("pause", (c, pst) -> new PlayerStatus(pst.getInstant(), Status.PAUSED)),
     BACK("backward", (mp, pst) -> {
         String newSong = mp.getPreviousSong(pst.getInstant().getSong());
         if (newSong == null) {

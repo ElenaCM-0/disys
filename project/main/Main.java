@@ -44,7 +44,6 @@ public class Main {
     private static Main instance = null;
     private Thread heartbeatThread;
     private Heartbeat heartbeat;
-    private boolean delayedHeartbeat = false;
     private MusicPlayerTask musicPlayerTask;
     private PartyConnection partyConnection; /*
                                               * If you are the host, this will be a hostConnection, however, if you are
@@ -146,6 +145,7 @@ public class Main {
                 try {
                     queue.put(input);
                 } catch (InterruptedException e) {
+                    stdin_real.close();
                     return;
                 }
 
@@ -599,7 +599,7 @@ public class Main {
         System.out.println("Creating the party...");
 
         /* Close remaining open threads */
-        connectionThreads.forEach((_, t) -> {
+        connectionThreads.forEach((c, t) -> {
             try {
                 endP2PThread(t);
             } catch (InterruptedException e) {
