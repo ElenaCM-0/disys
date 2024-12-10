@@ -253,11 +253,12 @@ public class Main {
         P2PConnection conn;
         for (Entry<P2PConnection, Thread> e : this.connectionThreads.entrySet()) {
             conn = e.getKey();
+            
+            conn.close();
 
             endP2PThread(e.getValue());
-
-            conn.close();
         }
+
         if (heartbeatThread != null) {
             if (heartbeatThread.isAlive()) {
                 heartbeatThread.interrupt();
@@ -266,6 +267,7 @@ public class Main {
         }
 
         stdinWriter.close();
+        userInput.join();
     }
 
     private void joinNetwork() throws UnknownHostException, IOException, InterruptedException {
