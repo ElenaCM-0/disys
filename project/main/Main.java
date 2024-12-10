@@ -36,7 +36,7 @@ import java.util.Map.Entry;
 
 public class Main {
     private final List<String> availableSongs = List.of("song1", "song2", "song3", "song4");
-    private final int TIMEOUT = 30;
+    private final int TIMEOUT = 3000;
     private final int max_party_nodes = 5;
 
     private static Main instance = null;
@@ -342,7 +342,9 @@ public class Main {
                     System.out.println(input);
 
                     boolean yes = receiveYN();
+                    System.out.println(yes);
                     partyRequests.setAnswer(yes);
+                    System.out.println(partyRequests.getAnswer());
 
                     if (yes) {
                         status = MAIN_STATUS.JOIN;
@@ -526,6 +528,9 @@ public class Main {
         while (!exit && num_party_nodes < max_party_nodes) {
             System.out.println(
                     "Waiting for responses, write \"enough\" if you want to move on to creating the party or write \"exit\" to move to the previous menu");
+            System.out.println("Has next line: " + scanner.hasNextLine());
+            System.out.println("System in: " + System.in.available());
+            System.out.println("Scaner closed: " + scanner.ioException());
             input = scanner.nextLine();
 
             switch (waker) {
@@ -544,7 +549,7 @@ public class Main {
                     }
 
                     num_party_nodes++;
-
+                    requestProcessed = true;
                     connectionThreads.get(partyAnswers.getWaitingConnection()).join();
 
                     HostConnection.addMember(partyAnswers.getWaitingConnection());
@@ -685,9 +690,9 @@ public class Main {
         status = MAIN_STATUS.YN;
 
         while (yes == null) {
-
+            System.out.println("Scanner waiting for answer");
             answer = stdin.nextLine();
-
+            System.out.println("Answer received by scanner");
             yes = processYN(answer);
 
             if (yes == null)

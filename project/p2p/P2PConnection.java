@@ -51,6 +51,7 @@ public class P2PConnection extends Connection {
 
                         break;
                     case START_PARTY:
+                        System.out.println("Processing start party");
                         if (processStartParty(message))
                             return;
                         break;
@@ -95,17 +96,26 @@ public class P2PConnection extends Connection {
 
         Boolean answer;
 
-        while ((answer = request.getAnswer()) == null)
-            ;
+        System.out.println("Waiting for answer");
+        while ((answer = request.getAnswer()) == null) {
+            System.out.println(answer);
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
 
+        System.out.println("Answer received");
         request.releaseLock();
-
         if (answer == false)
             return;
 
         JSONObject newMessage = new JSONObject();
         newMessage.put("type", MessageType.PARTY_RESPONSE.toString());
         send(newMessage);
+        System.out.println("Message sent");
 
         int num_songs = message.getInt("num_songs");
 
@@ -129,9 +139,9 @@ public class P2PConnection extends Connection {
 
         Main main = Main.getInstance();
 
-        // SharedInfo answer = main.getResponse();
-        //
-        // answer.acquireLock();
+        SharedInfo answer = main.getResponse();
+
+        answer.acquireLock();
 
         main.requestMain();
 
@@ -140,11 +150,13 @@ public class P2PConnection extends Connection {
             return false;
         }
 
-        // answer.setWaitingConnection(this);
-        //
-        // answer.setAnswer(null);
+        answer.setWaitingConnection(this);
+
+        answer.setAnswer(null);
 
         main.askUser(peer + " wants to join your party, accept?");
+        main.releaseMain();
+        answer.releaseLock();
 
         if (sent_time > max_response_time) {
             max_response_time = sent_time;
