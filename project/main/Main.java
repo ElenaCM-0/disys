@@ -11,6 +11,7 @@ import p2p.P2PConnection;
 import party.Action;
 import party.HostConnection;
 import party.heartbeat.Heartbeat;
+import party.heartbeat.HostHeartbeat;
 import party.heartbeat.MemberHeartbeat;
 import party.MemberConnection;
 
@@ -461,12 +462,11 @@ public class Main {
         partyConnectionThread = new Thread(partyConnection);
         partyConnectionThread.start();
 
-        musicPlayerTask.start(Long.valueOf(partyTime));
-
         heartbeat = new MemberHeartbeat();
         heartbeatThread = new Thread(heartbeat);
         heartbeatThread.start();
-        playingPartyMenu();
+
+        playingPartyMenu(Long.valueOf(partyTime));
     }
 
     /**
@@ -619,13 +619,20 @@ public class Main {
 
         HostConnection.startMembers();
 
-        HostConnection.sendStartParty(getNearestChange());
+        long start_time = getNearestChange();
+        HostConnection.sendStartParty(start_time);
 
         sendAction = (a) -> {
             HostConnection.sendActionRequest(a);
         };
 
-        playingPartyMenu();
+        heartbeat = new HostHeartbeat();
+        heartbeatThread = new Thread(heartbeat);
+        heartbeatThread.start();
+
+        musicPlayerTask = new MusicPlayerTask(new MusicPlayer(partySongs));
+        
+        playingPartyMenu(start_time);
     }
 
     /**
@@ -638,9 +645,11 @@ public class Main {
      * @throws UnknownHostException
      * @throws InterruptedException
      */
-    private void playingPartyMenu() throws UnknownHostException, IOException, InterruptedException {
+    private void playingPartyMenu(long start_time) throws UnknownHostException, IOException, InterruptedException {
         String action;
         Boolean exit = false;
+        
+        musicPlayerTask.start(Long.valueOf(start_time));
 
         status = MAIN_STATUS.PARTY;
         while (!exit) {
