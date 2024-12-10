@@ -90,7 +90,7 @@ public class HostConnection extends PartyConnection {
     public static void joinMembers() {
         members.forEach((c, t) -> {
             try {
-                t.interrupt();
+                if (t.isAlive()) t.interrupt();
                 t.join();
             } catch (InterruptedException e) {
                 e.printStackTrace();

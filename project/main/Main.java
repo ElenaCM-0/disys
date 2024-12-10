@@ -326,6 +326,8 @@ public class Main {
         thr.join();
         System.out.println("Joined network successfully");
         justUser = false;
+
+
     }
 
     private void startP2PConnections() {
@@ -476,7 +478,8 @@ public class Main {
 
         playingPartyMenu(Long.valueOf(partyTime));
 
-        HostConnection.joinMembers();
+        if (partyConnectionThread.isAlive()) partyConnectionThread.interrupt();
+        partyConnectionThread.join();
     }
 
     /**
@@ -643,6 +646,8 @@ public class Main {
         musicPlayerTask = new MusicPlayerTask(new MusicPlayer(partySongs));
 
         playingPartyMenu(start_time);
+
+        HostConnection.joinMembers();
     }
 
     /**
