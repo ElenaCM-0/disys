@@ -68,6 +68,7 @@ public class Main {
      * Function that will return only when requestProcessed is true
      */
     private void waitForMain() {
+        System.out.println("Hello");
         while (!requestProcessed) {
             try {
                 Thread.sleep(100);
@@ -204,11 +205,12 @@ public class Main {
     }
 
     /**
-     * Method that will free the lock to talk to the main, without waiting for the main
+     * Method that will free the lock to talk to the main, without waiting for the
+     * main
      */
     public void unlockMain() {
         talkToMain.unlock();
-    }    
+    }
 
     /**
      * 
