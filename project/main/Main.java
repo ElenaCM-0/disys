@@ -10,7 +10,6 @@ import music_player.MusicPlayer;
 import p2p.P2PConnection;
 import party.Action;
 import party.HostConnection;
-import party.PartyConnection;
 import party.heartbeat.Heartbeat;
 import party.heartbeat.MemberHeartbeat;
 import party.MemberConnection;
@@ -30,6 +29,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Consumer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,7 +45,7 @@ public class Main {
     private Thread heartbeatThread;
     private Heartbeat heartbeat;
     private MusicPlayerTask musicPlayerTask;
-    private PartyConnection partyConnection; /*
+    private Consumer<Action> sendAction; /*
                                               * If you are the host, this will be a hostConnection, however, if you are
                                               * a playing party member, this will be the connection that connects you to
                                               * the host
@@ -318,6 +318,7 @@ public class Main {
         System.out.println("Name sent to your neighbour");
         thr.join();
         System.out.println("Joined network successfully");
+        justUser = false;
     }
 
     private void startP2PConnections() {
@@ -447,7 +448,16 @@ public class Main {
             }
         }
 
-        partyConnection = new MemberConnection(hostConnection);
+        MemberConnection partyConnection = new MemberConnection(hostConnection);
+        sendAction = (a) -> {
+            try {
+                partyConnection.sendActionRequest(a);
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                return;
+            }
+        };
+
         partyConnectionThread = new Thread(partyConnection);
         partyConnectionThread.start();
 
@@ -611,6 +621,10 @@ public class Main {
 
         HostConnection.sendStartParty(getNearestChange());
 
+        sendAction = (a) -> {
+            HostConnection.sendActionRequest(a);
+        };
+
         playingPartyMenu();
     }
 
@@ -672,12 +686,7 @@ public class Main {
                 continue;
             }
 
-            try {
-                partyConnection.sendActionRequest(matchedAction);
-            } catch (IOException e) {
-                System.out.println("You action cannot be executed");
-                continue;
-            }
+            sendAction.accept(matchedAction);
         }
 
     }
@@ -710,6 +719,7 @@ public class Main {
         }
 
         status = prevStatus;
+        justUser = false;
 
         return yes;
     }

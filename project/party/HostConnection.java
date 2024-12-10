@@ -66,8 +66,7 @@ public class HostConnection extends PartyConnection {
         }
     }
 
-    @Override
-    public void sendActionRequest(Action act) {
+    public static void sendActionRequest(Action act) {
         Main main = Main.getInstance();
         long time = main.getNearestChange();
 

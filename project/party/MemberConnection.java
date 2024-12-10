@@ -46,7 +46,6 @@ public class MemberConnection extends PartyConnection {
 
     }
 
-    @Override
     public void sendActionRequest(Action act) throws IOException {
         JSONObject message = new JSONObject();
         message.put("type", MessageType.ACTION_REQUEST.toString());
