@@ -34,6 +34,11 @@ public enum Action {
         this.applyCommand = applyCommand;
     }
 
+    @Override
+    public String toString() {
+        return command;
+    }
+
     /**
      * Gets the new status of the music player after applying the command
      * represented by this action. This command doesn change the music player, but

@@ -45,7 +45,7 @@ public class HostConnection extends PartyConnection {
         Action action;
 
         try {
-            while ((message = socket.receive("action_request")) != null) {
+            while ((message = socket.receive(MessageType.ACTION_REQUEST.toString())) != null) {
                 action = Action.match(message.getString("command"));
 
                 if (action == null) {
