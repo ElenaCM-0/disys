@@ -16,7 +16,7 @@ import music_player.exceptions.SongNotFoundException;
 import utils.SongInstant;
 
 public class MusicPlayer {
-    private static final String BASE_URL = "/songs/";
+    private static final String BASE_URL = "../songs/";
     private List<String> songs;
     private MediaPlayer player;
     private int currentIndex = 0;
@@ -29,7 +29,8 @@ public class MusicPlayer {
      * @throws SongNotFoundException if the song can not be found
      */
     private MediaPlayer createPlayer(String song) throws SongNotFoundException {
-        MediaPlayer player;
+        MediaPlayer player = null;
+        ;
         try {
             String audioFilePath = getClass().getResource(BASE_URL + song).toExternalForm();
             Media media = new Media(audioFilePath);
@@ -47,7 +48,7 @@ public class MusicPlayer {
                 }
             });
         } catch (Exception e) {
-            throw new SongNotFoundException(songs.getFirst());
+            e.printStackTrace();
         }
 
         return player;

@@ -47,10 +47,10 @@ public class Main {
     private Heartbeat heartbeat;
     private MusicPlayerTask musicPlayerTask;
     private Consumer<Action> sendAction; /*
-                                              * If you are the host, this will be a hostConnection, however, if you are
-                                              * a playing party member, this will be the connection that connects you to
-                                              * the host
-                                              */
+                                          * If you are the host, this will be a hostConnection, however, if you are
+                                          * a playing party member, this will be the connection that connects you to
+                                          * the host
+                                          */
     private Thread partyConnectionThread;
     private SharedInfo partyRequests = new SharedInfo();
     private SharedInfo partyAnswers = new SharedInfo();
@@ -249,7 +249,7 @@ public class Main {
     }
 
     private void exitApp() throws InterruptedException, IOException {
-        System.out.println("Exiting app..,");
+        System.out.println("Exiting app...");
         P2PConnection conn;
         for (Entry<P2PConnection, Thread> e : this.connectionThreads.entrySet()) {
             conn = e.getKey();
@@ -631,7 +631,7 @@ public class Main {
         heartbeatThread.start();
 
         musicPlayerTask = new MusicPlayerTask(new MusicPlayer(partySongs));
-        
+
         playingPartyMenu(start_time);
     }
 
@@ -648,7 +648,7 @@ public class Main {
     private void playingPartyMenu(long start_time) throws UnknownHostException, IOException, InterruptedException {
         String action;
         Boolean exit = false;
-        
+
         musicPlayerTask.start(Long.valueOf(start_time));
 
         status = MAIN_STATUS.PARTY;
@@ -718,9 +718,7 @@ public class Main {
         justUser = true;
 
         while (yes == null) {
-            System.out.println("Scanner waiting for answer");
             answer = stdin.nextLine();
-            System.out.println("Answer received by scanner");
             yes = processYN(answer);
 
             if (yes == null)

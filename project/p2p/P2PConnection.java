@@ -28,7 +28,6 @@ public class P2PConnection extends Connection {
 
     @Override
     public void run() {
-        System.out.println("Waiting for " + peer + " to send a message");
         try {
             while (!Thread.interrupted()) {
                 // Receive message
@@ -51,7 +50,7 @@ public class P2PConnection extends Connection {
 
                         break;
                     case START_PARTY:
-                        System.out.println("Processing start party");
+                        System.out.println("Part starting...");
                         if (processStartParty(message))
                             return;
                         break;
@@ -116,8 +115,6 @@ public class P2PConnection extends Connection {
         JSONObject newMessage = new JSONObject();
         newMessage.put("type", MessageType.PARTY_RESPONSE.toString());
         send(newMessage);
-        System.out.println("Message sent");
-
         int num_songs = message.getInt("num_songs");
 
         List<String> song_list = new ArrayList<>();
