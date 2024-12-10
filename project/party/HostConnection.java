@@ -87,6 +87,17 @@ public class HostConnection extends PartyConnection {
         });
     }
 
+    public static void joinMembers() {
+        members.forEach((c, t) -> {
+            try {
+                t.interrupt();
+                t.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
     public static void sendUpdateToMembers(Update update, Main main) {
         JSONObject message = update.createUpdateJSON();
 

@@ -39,7 +39,7 @@ import java.util.Map.Entry;
 
 public class Main {
     private final List<String> availableSongs = List.of("song1", "song2", "song3", "song4");
-    private final int TIMEOUT = 3000;
+    private final int TIMEOUT = 15;
     private final int max_party_nodes = 5;
 
     private static Main instance = null;
@@ -52,6 +52,7 @@ public class Main {
                                           * the host
                                           */
     private Thread partyConnectionThread;
+    private Thread timeout;
     private SharedInfo partyRequests = new SharedInfo();
     private SharedInfo partyAnswers = new SharedInfo();
     private Map<P2PConnection, Thread> connectionThreads = new HashMap<>();
@@ -153,6 +154,10 @@ public class Main {
                 waitForMain();
 
                 talkToMain.unlock();
+
+                if (status == MAIN_STATUS.EXIT) {
+                    break;
+                }
             }
 
             stdin_real.close();
@@ -357,6 +362,7 @@ public class Main {
                     if (yes) {
                         status = MAIN_STATUS.JOIN;
                         joinParty(conn);
+                        timeout.join();
                     } else {
                         requestProcessed = true;
                     }
@@ -372,6 +378,7 @@ public class Main {
                         case "party":
                             status = MAIN_STATUS.HOST;
                             startParty();
+                            timeout.join();
                             break;
                         default:
                             requestProcessed = true;
@@ -402,7 +409,7 @@ public class Main {
 
         /* Set thread timeout to avoid waiting forever */
 
-        Thread thr = new Thread(() -> {
+        timeout = new Thread(() -> {
             try {
                 Thread.sleep(TIMEOUT * 1000);
             } catch (InterruptedException e) {
@@ -426,7 +433,7 @@ public class Main {
             talkToMain.unlock();
 
         });
-        thr.start();
+        timeout.start();
 
         String partyTime = queue.take();
         if (waker == WAKER.TIMEOUT) {
@@ -468,6 +475,8 @@ public class Main {
         heartbeatThread.start();
 
         playingPartyMenu(Long.valueOf(partyTime));
+
+        HostConnection.joinMembers();
     }
 
     /**
@@ -515,7 +524,7 @@ public class Main {
         num_party_nodes = 0;
 
         /* Set thread timeout to avoid waiting forever */
-        Thread thr = new Thread(() -> {
+        timeout = new Thread(() -> {
             try {
                 Thread.sleep(TIMEOUT * 1000);
             } catch (InterruptedException e) {
@@ -538,7 +547,7 @@ public class Main {
             }
             talkToMain.unlock();
         });
-        thr.start();
+        timeout.start();
 
         String input;
         boolean no;
