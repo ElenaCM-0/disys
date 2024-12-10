@@ -291,7 +291,6 @@ public class Main {
                 JSONObject message = connectedSocket.receive();
                 String name = message.getString("user");
                 connectionThreads.put(new P2PConnection(name, connectedSocket), null);
-                System.out.println("You are listening from " + name);
                 serverSocket.close();
             } catch (IOException | InterruptedException e) {
                 // TODO Auto-generated catch block
@@ -788,7 +787,7 @@ public class Main {
                 break;
             } else if (availableSongs.contains(input)) {
                 if (!partySongs.contains(input)) {
-                    partySongs.add(input);
+                    partySongs.add(input.concat(".mp3"));
                     System.out.println(input + " has been added to the party!");
                 } else {
                     System.out.println(input + " is already in the party list.");

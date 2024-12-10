@@ -125,28 +125,24 @@ public class MusicPlayerTask {
     // Example about how to implement doing an action in a certain UTC time. I
     // copied it just to have the idea abou how the process is done. This is not
     // final code at all
-    public static void main(String[] args) {
-        // Define el tiempo UTC deseado
-        Instant targetTime = Instant.parse("2024-11-27T15:00:00Z");
-
-        // Calcula el tiempo restante hasta el objetivo
-        Instant now = Instant.now();
-        long delayInMillis = targetTime.toEpochMilli() - now.toEpochMilli();
-
-        if (delayInMillis <= 0) {
-            System.out.println("El tiempo especificado ya pasó.");
-            return;
-        }
-
-        // Crea un programador
-        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-
-        // Programa la tarea
-        scheduler.schedule(() -> {
-            System.out.println("¡Ejecutando tarea a las " + Instant.now() + " UTC!");
-        }, delayInMillis, TimeUnit.MILLISECONDS);
-
-        System.out.println("Tarea programada para las " + targetTime + " UTC.");
+    public static void main(String[] args) throws InterruptedException {
+        List<String> songs = new ArrayList<>();
+        songs.add("song1.mp3");
+        songs.add("song2.mp3");
+        MusicPlayer mp = new MusicPlayer(songs);
+        MusicPlayerTask mpt = new MusicPlayerTask(mp);
+        mpt.start(1000);
+        Thread.sleep(4000);
+        long time = Instant.now().toEpochMilli() + 3000;
+        mpt.createAndAddUpdate(Action.SKIP, time);
+        time = time + 3000;
+        mpt.createAndAddUpdate(Action.PAUSE, time);
+        time = time + 3000;
+        mpt.createAndAddUpdate(Action.PLAY, time);
+        time = time + 3000;
+        mpt.createAndAddUpdate(Action.BACK, time);
+        Thread.sleep(15000);
+        mp.stop();
     }
 
 }
