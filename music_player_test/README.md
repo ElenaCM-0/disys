@@ -17,6 +17,7 @@
     ```bash
     sudo apt install openjfx
     ```
+    - It is also necessary to have GStreamer
 
 ## How to test it
 1. If you have downloaded and installed a new version of Java, make sure it is configured to be used in then terminal. 
