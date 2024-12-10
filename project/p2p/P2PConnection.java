@@ -85,6 +85,7 @@ public class P2PConnection extends Connection {
 
         if (main.getStatus() != Main.MAIN_STATUS.P2P) {
             main.unlockMain();
+            request.releaseLock();
             return;
         }
 
@@ -96,18 +97,16 @@ public class P2PConnection extends Connection {
 
         Boolean answer;
 
-        System.out.println("Waiting for answer");
         while ((answer = request.getAnswer()) == null) {
-            System.out.println(answer);
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
+
         }
 
-        System.out.println("Answer received");
         main.releaseMain();
 
         request.releaseLock();
@@ -149,6 +148,7 @@ public class P2PConnection extends Connection {
 
         if (main.getStatus() != Main.MAIN_STATUS.HOST) {
             main.unlockMain();
+            answer.releaseLock();
             return false;
         }
 
@@ -179,6 +179,7 @@ public class P2PConnection extends Connection {
 
         party_time = message.getLong("time");
         main.askUser(party_time.toString());
+        main.releaseMain();
         return true;
     }
 
