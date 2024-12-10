@@ -204,6 +204,13 @@ public class Main {
     }
 
     /**
+     * Method that will free the lock to talk to the main, without waiting for the main
+     */
+    public void unlockMain() {
+        talkToMain.unlock();
+    }    
+
+    /**
      * 
      * @return the main's current status, from the enum
      */

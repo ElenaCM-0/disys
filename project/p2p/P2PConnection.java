@@ -84,7 +84,7 @@ public class P2PConnection extends Connection {
         main.requestMain();
 
         if (main.getStatus() != Main.MAIN_STATUS.P2P) {
-            main.releaseMain();
+            main.unlockMain();
             return;
         }
 
@@ -108,6 +108,8 @@ public class P2PConnection extends Connection {
         }
 
         System.out.println("Answer received");
+        main.releaseMain();
+
         request.releaseLock();
         if (answer == false)
             return;
@@ -146,7 +148,7 @@ public class P2PConnection extends Connection {
         main.requestMain();
 
         if (main.getStatus() != Main.MAIN_STATUS.HOST) {
-            main.releaseMain();
+            main.unlockMain();
             return false;
         }
 
@@ -171,7 +173,7 @@ public class P2PConnection extends Connection {
         main.requestMain();
 
         if (main.getStatus() != Main.MAIN_STATUS.JOIN) {
-            main.releaseMain();
+            main.unlockMain();
             return false;
         }
 
