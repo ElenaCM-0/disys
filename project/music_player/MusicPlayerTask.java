@@ -122,6 +122,10 @@ public class MusicPlayerTask {
         }, delayInMillis, TimeUnit.MILLISECONDS);
     }
 
+    public void stop() {
+        this.mp.stop();
+    }
+
     // Example about how to implement doing an action in a certain UTC time. I
     // copied it just to have the idea abou how the process is done. This is not
     // final code at all

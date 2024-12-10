@@ -686,6 +686,7 @@ public class Main {
                 status = MAIN_STATUS.P2P;
                 requestProcessed = true;
                 exit = true;
+                musicPlayerTask.stop();
                 continue;
             }
 
