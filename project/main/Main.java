@@ -653,6 +653,9 @@ public class Main {
 
         playingPartyMenu(start_time);
 
+        heartbeatThread.interrupt();
+        heartbeatThread.join();
+        
         HostConnection.joinMembers();
     }
 
