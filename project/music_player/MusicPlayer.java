@@ -39,13 +39,13 @@ public class MusicPlayer {
                 if (this.currentIndex < this.songs.size() - 1) {
                     // Create player for next song and start playing it
                     this.currentIndex++;
-                    this.player.stop();
-                    this.player.dispose();
-                    this.player = this.createPlayer(this.songs.get(this.currentIndex));
-                    this.player.play();
                 } else {
-                    Platform.exit();
+                    this.currentIndex = 0;
                 }
+                this.player.stop();
+                this.player.dispose();
+                this.player = this.createPlayer(this.songs.get(this.currentIndex));
+                this.player.play();
             });
         } catch (Exception e) {
             e.printStackTrace();
@@ -95,11 +95,9 @@ public class MusicPlayer {
     public String getnextSong(String fromSong) {
         int songIndex = this.songs.indexOf(fromSong);
 
-        if (songIndex == -1 || songIndex == this.songs.size() - 1) {
-            return null;
-        }
+        if (songIndex == -1) return null;
 
-        return this.songs.get(songIndex + 1);
+        return this.songs.get((songIndex + 1)%this.songs.size());
     }
 
     /**
@@ -110,11 +108,11 @@ public class MusicPlayer {
     public String getPreviousSong(String fromSong) {
         int songIndex = this.songs.indexOf(fromSong);
 
-        if (songIndex == -1 || songIndex == 0) {
+        if (songIndex == -1) {
             return null;
         }
 
-        return this.songs.get(songIndex - 1);
+        return this.songs.get(((songIndex - 1) + this.songs.size())%this.songs.size());
     }
 
     /**
