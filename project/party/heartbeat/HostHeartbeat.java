@@ -21,12 +21,12 @@ public class HostHeartbeat extends Heartbeat {
 
     @Override
     protected long MAX_DISTANCE() {
-        return 2;
+        return 1000;
     }
 
     @Override
     protected int SLEEP_SEC() {
-        return 10;
+        return 15;
     }
 
 }

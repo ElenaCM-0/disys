@@ -22,7 +22,13 @@ public abstract class Heartbeat implements Runnable {
             while (repeat) {
                 Thread.sleep(1000 * SLEEP_SEC());
 
-                if ((Instant.now().getEpochSecond() - latestUpdate) >= MAX_DISTANCE())
+                System.out.println("Heartbeat thread waking up");
+
+                System.out.println("The current time is " + Instant.now().toEpochMilli());
+                System.out.println("The latest update time is " + latestUpdate);
+
+                System.out.println("");
+                if ((Instant.now().toEpochMilli() - latestUpdate) < MAX_DISTANCE())
                     continue;
 
                 /* It has been too long since the last update */

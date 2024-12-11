@@ -15,11 +15,11 @@ public class MemberHeartbeat extends Heartbeat {
 
     @Override
     protected long MAX_DISTANCE() {
-        return 10;
+        return 2000;
     }
 
     @Override
     protected int SLEEP_SEC() {
-        return 40;
+        return 20;
     }
 }
