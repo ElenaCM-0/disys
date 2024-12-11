@@ -20,6 +20,6 @@ public class MemberHeartbeat extends Heartbeat {
 
     @Override
     protected int SLEEP_SEC() {
-        return 30;
+        return 40;
     }
 }

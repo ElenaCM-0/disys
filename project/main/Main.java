@@ -634,7 +634,7 @@ public class Main {
 
         HostConnection.startMembers();
 
-        long start_time = getNearestChange() + 10;
+        long start_time = getNearestChange() + 100;
         HostConnection.sendStartParty(start_time);
 
         sendAction = (a) -> {
