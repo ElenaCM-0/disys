@@ -110,7 +110,7 @@ public class MySocket {
                 return new JSONObject(messageStr);
             } catch (IOException e) {
                 if (Thread.interrupted()) {
-                    throw new InterruptedException();
+                    return null;
                 }
             }
         }

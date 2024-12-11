@@ -217,14 +217,13 @@ Whoever gets the lock:
 
 #### TODO
 
-- Pipe broken
-- Exit bad
-- Add print waiting for answer
 - Fix heartbeat
-- Reject party
-- Enough without members
 - Comments
 - Prep presentation
+
+Double forward
+Do nothing for a while (test host sends heartbeats)
+Host ctrl+C
 
 
 ### Comments

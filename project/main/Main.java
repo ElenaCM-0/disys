@@ -413,7 +413,7 @@ public class Main {
 
         timeout = new Thread(() -> {
             try {
-                Thread.sleep(TIMEOUT * 1000);
+                Thread.sleep(TIMEOUT*2 * 1000);
             } catch (InterruptedException e) {
                 return;
             }
@@ -445,6 +445,8 @@ public class Main {
             System.out.println("The host didn't accept you, going back to the menu...");
             return;
         }
+
+        System.out.println("Party starting...");
 
         status = MAIN_STATUS.PARTY;
         requestProcessed = true;

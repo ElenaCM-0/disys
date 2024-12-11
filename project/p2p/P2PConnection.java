@@ -50,7 +50,6 @@ public class P2PConnection extends Connection {
 
                         break;
                     case START_PARTY:
-                        System.out.println("Party starting...");
                         if (processStartParty(message))
                             return;
                         break;
