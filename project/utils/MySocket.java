@@ -101,20 +101,19 @@ public class MySocket {
         while (true) {
             try {
                 messageStr = in.readLine();
-    
+
                 if (messageStr == null) {
-    
+
                     return null;
                 }
-    
+
                 return new JSONObject(messageStr);
             } catch (IOException e) {
-                if (Thread.interrupted()) {
+                if (Thread.currentThread().isInterrupted()) {
                     return null;
                 }
             }
         }
-        
 
     }
 
