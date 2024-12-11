@@ -16,7 +16,7 @@ public class HostHeartbeat extends Heartbeat {
 
         /* Create message to send to the other nodes */
 
-        HostConnection.sendUpdateToMembers(new Update(status, nearestChange), main);
+        HostConnection.sendUpdateToMembers(new Update(status, nearestChange));
     }
 
     @Override

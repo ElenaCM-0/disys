@@ -72,7 +72,7 @@ public class HostConnection extends PartyConnection {
 
         main.getHeartbeat().lastUpdate(time);
 
-        sendUpdateToMembers(update, main);
+        sendUpdateToMembers(update);
     }
 
     public static void startMembers() {
@@ -96,7 +96,7 @@ public class HostConnection extends PartyConnection {
         });
     }
 
-    public static void sendUpdateToMembers(Update update, Main main) {
+    public static void sendUpdateToMembers(Update update) {
         JSONObject message = update.createUpdateJSON();
 
         message.put("type", MessageType.EXECUTE_ACTION.toString());

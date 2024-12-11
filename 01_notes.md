@@ -221,6 +221,9 @@ Whoever gets the lock:
 - Comments
 - Prep presentation
 
+- Fix seconds in song
+- fix exit
+
 Double forward
 Do nothing for a while (test host sends heartbeats)
 Host ctrl+C

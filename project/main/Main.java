@@ -483,6 +483,9 @@ public class Main {
         playingPartyMenu(Long.valueOf(partyTime));
 
         if (partyConnectionThread.isAlive()) partyConnectionThread.interrupt();
+
+        System.out.println("Returning to the playing party menu");
+        
         partyConnectionThread.join();
     }
 
@@ -678,7 +681,7 @@ public class Main {
                     + "\n- forward: if you want to skip to the next song"
                     + "\n- backward: if you want to go back to the previous song"
                     + "\n- exit: if you want to disconnect from the playing party"
-                    + "\nNote: if your request is not posible to execute (f.e you skip and it is the last song), your request will be ignored");
+                    + "\nNote: if your request is not possible to execute (f.e you skip and it is the last song), your request will be ignored");
 
             action = queue.take();
 

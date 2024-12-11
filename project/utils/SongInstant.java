@@ -45,7 +45,8 @@ public class SongInstant {
         if (instant == null) {
             if (other.instant != null)
                 return false;
-        } else if (!instant.equals(other.instant))
+                
+        } else if (Math.abs(instant.toSeconds() - other.instant.toSeconds()) > 2)
             return false;
         return true;
     }
