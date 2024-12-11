@@ -1,6 +1,18 @@
 {
     "java.project.outputPath": "bin",
     "java.project.referencedLibraries": [
-        "lib/**/*.jar"
+        "/home/niklasny/Desktop/Distributed systems project/disys/project/lib/json-20210307.jar",
+        "lib/javafx-swt.jar",
+        "lib/javafx.web.jar",
+        "lib/javafx.swing.jar",
+        "lib/javafx.media.jar",
+        "lib/javafx.graphics.jar",
+        "lib/javafx.fxml.jar",
+        "lib/javafx.controls.jar",
+        "lib/javafx.base.jar"
+    ],
+    "java.dependency.packagePresentation": "hierarchical",
+    "java.project.sourcePaths": [
+        "."
     ]
 }
