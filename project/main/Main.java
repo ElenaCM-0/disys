@@ -286,7 +286,7 @@ public class Main {
                                                                                                 // which one?
         System.out.println("Write the IP address of the node next to you: ");
         String ipNeighbour = stdin.nextLine();
-        System.out.println("Write the user name of the node next to you: ");
+        System.out.println("Write the username of the node next to you: ");
         String userNeighbour = stdin.nextLine();
 
         ServerSocket serverSocket = new ServerSocket(PORT);

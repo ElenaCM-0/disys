@@ -92,7 +92,7 @@ public class P2PConnection extends Connection {
 
         request.setAnswer(null);
 
-        main.askUser(peer + " is hosting a playin party, do you want to join?");
+        main.askUser(peer + " is hosting a playing party, do you want to join?");
 
         Boolean answer;
 

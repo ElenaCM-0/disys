@@ -26,7 +26,7 @@ public class HostHeartbeat extends Heartbeat {
 
     @Override
     protected int SLEEP_SEC() {
-        return 25;
+        return 20;
     }
 
 }
