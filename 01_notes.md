@@ -226,7 +226,8 @@ Whoever gets the lock:
 
 Party thread is not joining
 Hearbeats are being sent too slowly
-Updates include time, but they are always playing the beginning of a song
+first song is really bad
+join party without users
 
 
 ### Comments

@@ -2,6 +2,7 @@ package party;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -70,8 +71,6 @@ public class HostConnection extends PartyConnection {
 
         Update update = main.getMusicPlayerTask().createAndAddUpdate(act, time);
 
-        main.getHeartbeat().lastUpdate(time);
-
         sendUpdateToMembers(update);
     }
 
@@ -100,6 +99,8 @@ public class HostConnection extends PartyConnection {
         JSONObject message = update.createUpdateJSON();
 
         message.put("type", MessageType.EXECUTE_ACTION.toString());
+
+        Main.getInstance().getHeartbeat().lastUpdate(Instant.now().toEpochMilli());
 
         try {
             sendToMembers(message);

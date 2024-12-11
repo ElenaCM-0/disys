@@ -15,7 +15,7 @@ public class HostHeartbeat extends Heartbeat {
         PlayerStatus status = main.getMusicPlayerTask().getStatus(nearestChange);
 
         /* Create message to send to the other nodes */
-
+        System.out.println("Sending heartbeat to users, for time " + nearestChange);
         HostConnection.sendUpdateToMembers(new Update(status, nearestChange));
     }
 
