@@ -11,7 +11,7 @@ public class MySocket {
     private OutputStreamWriter out;
     private BufferedReader in;
 
-    private final int TIMEOUT = 10000;
+    private final int TIMEOUT = 5000;
 
     /**
      * It will create the channels for socket connection
