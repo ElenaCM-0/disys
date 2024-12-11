@@ -333,6 +333,15 @@ public class MusicPlayer {
      */
     public SongInstant getSongInstantFromNow(long targetTime) {
         String song = this.songs.get(currentIndex);
+        
+        while (this.player == null) {
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                break;
+            }
+        }
+
         Duration currentDuration = this.player.getCurrentTime();
         long currentTime = Instant.now().toEpochMilli();
         SongInstant currentInstant = new SongInstant(song, currentDuration);
