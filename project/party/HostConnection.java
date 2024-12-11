@@ -60,8 +60,6 @@ public class HostConnection extends PartyConnection {
         } catch (InterruptedException e) {
             return;
         } catch (IOException e) {
-            e.printStackTrace();
-
             return;
         }
     }
@@ -93,7 +91,7 @@ public class HostConnection extends PartyConnection {
                 if (t.isAlive()) t.interrupt();
                 t.join();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                return;
             }
         });
     }
@@ -106,8 +104,6 @@ public class HostConnection extends PartyConnection {
         try {
             sendToMembers(message);
         } catch (IOException e) {
-            e.printStackTrace();
-
             return;
         }
     }

@@ -25,8 +25,6 @@ public class MySocket {
             out = new OutputStreamWriter(tunnel.getOutputStream(), StandardCharsets.UTF_8);
             in = new BufferedReader(new InputStreamReader(tunnel.getInputStream(), StandardCharsets.UTF_8));
         } catch (IOException e) {
-            e.printStackTrace();
-
             return;
         }
     }

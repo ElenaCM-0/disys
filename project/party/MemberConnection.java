@@ -39,8 +39,6 @@ public class MemberConnection extends PartyConnection {
         } catch (InterruptedException e) {
             return;
         } catch (IOException e) {
-            e.printStackTrace();
-
             return;
         }
 

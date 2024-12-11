@@ -50,7 +50,7 @@ public class P2PConnection extends Connection {
 
                         break;
                     case START_PARTY:
-                        System.out.println("Part starting...");
+                        System.out.println("Party starting...");
                         if (processStartParty(message))
                             return;
                         break;
@@ -63,7 +63,7 @@ public class P2PConnection extends Connection {
         } catch (InterruptedException e) {
             return;
         } catch (IOException e) {
-            e.printStackTrace();
+            return;
         }
     }
 
@@ -101,7 +101,7 @@ public class P2PConnection extends Connection {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
                 // TODO Auto-generated catch block
-                e.printStackTrace();
+                continue;
             }
 
         }

@@ -301,7 +301,7 @@ public class Main {
                 serverSocket.close();
             } catch (IOException | InterruptedException e) {
                 // TODO Auto-generated catch block
-                e.printStackTrace();
+                return;
             }
 
         });
@@ -426,7 +426,7 @@ public class Main {
                 try {
                     queue.put("Timeout");
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    return;
                 }
 
                 waitForMain();
@@ -436,6 +436,8 @@ public class Main {
 
         });
         timeout.start();
+
+        System.out.println("Waiting for the host's reply");
 
         String partyTime = queue.take();
         if (waker == WAKER.TIMEOUT) {
@@ -521,7 +523,6 @@ public class Main {
                 con.sendPartyRequest(request);
             }
         } catch (IOException e) {
-            e.printStackTrace();
         }
 
         num_party_nodes = 0;
@@ -626,7 +627,7 @@ public class Main {
             try {
                 endP2PThread(t);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                
             }
         });
 

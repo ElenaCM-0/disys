@@ -215,9 +215,16 @@ Whoever gets the lock:
 - Playing party menu heartbeat problems part (Elena)
 - Update list order
 
-#### SCHEDULE
+#### TODO
 
-- What happens if the connection is closed? (thread starting)
+- Pipe broken
+- Exit bad
+- Add print waiting for answer
+- Fix heartbeat
+- Reject party
+- Enough without members
+- Comments
+- Prep presentation
 
 
 ### Comments
