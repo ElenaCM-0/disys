@@ -138,14 +138,11 @@ public class MusicPlayerTask {
         mpt.start(1000);
         Thread.sleep(4000);
         long time = Instant.now().toEpochMilli() + 3000;
-        mpt.createAndAddUpdate(Action.SKIP, time);
-        time = time + 3000;
+        time = time + 5000;
         mpt.createAndAddUpdate(Action.PAUSE, time);
         time = time + 3000;
         mpt.createAndAddUpdate(Action.PLAY, time);
-        time = time + 3000;
-        mpt.createAndAddUpdate(Action.BACK, time);
-        Thread.sleep(15000);
+        Thread.sleep(300000);
         mp.stop();
     }
 

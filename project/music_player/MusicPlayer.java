@@ -156,8 +156,10 @@ public class MusicPlayer {
         this.player.stop();
         this.player.dispose();
         this.player = createPlayer(song);
-        this.player.seek(instant);
-        status.set(this);
+        this.player.setOnReady(() -> {
+            this.player.seek(instant);
+            status.set(this);
+        });
         this.currentIndex = songIndex;
     }
 
