@@ -692,10 +692,8 @@ public class Main {
                 case HEART:
                     System.out.println(action);
                     if (!receiveYN()) {
-                        // TODO Not sure but I guess this
-                        status = MAIN_STATUS.P2P;
-                        requestProcessed = true;
-                        return;
+                        exit = true;
+                        continue;
                     }
                     requestProcessed = true;
                     continue;
@@ -706,11 +704,8 @@ public class Main {
             }
 
             if (action.equals("exit")) {
-                status = MAIN_STATUS.P2P;
-                requestProcessed = true;
                 exit = true;
-                musicPlayerTask.stop();
-                return;
+                continue;
             }
 
             Action matchedAction = Action.match(action);
@@ -722,6 +717,11 @@ public class Main {
 
             sendAction.accept(matchedAction);
         }
+
+        status = MAIN_STATUS.P2P;
+        requestProcessed = true;
+
+        musicPlayerTask.stop();
 
     }
 

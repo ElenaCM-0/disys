@@ -29,7 +29,7 @@ public class P2PConnection extends Connection {
     @Override
     public void run() {
         try {
-            while (!Thread.interrupted()) {
+            while (!Thread.currentThread().isInterrupted()) {
                 // Receive message
                 JSONObject message = socket.receive();
 

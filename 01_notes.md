@@ -223,6 +223,8 @@ Whoever gets the lock:
 - fix exit
 
 Party thread is not joining
+
+music player is null
 join party without users
 
 
