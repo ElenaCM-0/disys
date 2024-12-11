@@ -276,16 +276,12 @@ public class Main {
     }
 
     private void joinNetwork() throws UnknownHostException, IOException, InterruptedException {
+        String netMask = "192.168.27.";
         justUser = true;
 
         // configuration of the net:
-        System.out.println("Write your IP address");
-        String myIP = stdin.nextLine();
-
-        System.out.println("Your IP address is: " + myIP + " Share it with one of the nodes."); // how do we control
-                                                                                                // which one?
         System.out.println("Write the IP address of the node next to you: ");
-        String ipNeighbour = stdin.nextLine();
+        String ipNeighbour = netMask.concat(stdin.nextLine());
         System.out.println("Write the username of the node next to you: ");
         String userNeighbour = stdin.nextLine();
 
