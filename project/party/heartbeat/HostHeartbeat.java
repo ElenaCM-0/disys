@@ -15,18 +15,17 @@ public class HostHeartbeat extends Heartbeat {
         PlayerStatus status = main.getMusicPlayerTask().getStatus(nearestChange);
 
         /* Create message to send to the other nodes */
-        System.out.println("Sending heartbeat to users, for time " + nearestChange);
         HostConnection.sendUpdateToMembers(new Update(status, nearestChange));
     }
 
     @Override
     protected long MAX_DISTANCE() {
-        return 1000;
+        return 100;
     }
 
     @Override
     protected int SLEEP_SEC() {
-        return 15;
+        return 10;
     }
 
 }

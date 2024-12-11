@@ -217,16 +217,12 @@ Whoever gets the lock:
 
 #### TODO
 
-- Fix heartbeat
 - Comments
 - Prep presentation
 
-- Fix seconds in song
 - fix exit
 
 Party thread is not joining
-Hearbeats are being sent too slowly
-first song is really bad
 join party without users
 
 
