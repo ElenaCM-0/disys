@@ -133,7 +133,8 @@ public class MySocket {
 
         while (true) {
             message = this.receive();
-            if (message != null && message.getString("type").equals(type))
+            if (message == null) return null;
+            if (message.getString("type").equals(type))
                 return message;
         }
     }
