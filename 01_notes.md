@@ -228,10 +228,6 @@ Party thread is not joining
 Hearbeats are being sent too slowly
 Updates include time, but they are always playing the beginning of a song
 
-Double forward
-Do nothing for a while (test host sends heartbeats)
-Host ctrl+C
-
 
 ### Comments
 

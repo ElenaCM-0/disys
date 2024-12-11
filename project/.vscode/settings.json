@@ -1,7 +1,7 @@
 {
     "java.project.outputPath": "bin",
     "java.project.referencedLibraries": [
-        "/home/niklasny/Desktop/Distributed systems project/disys/project/lib/json-20210307.jar",
+        "lib/json-20210307.jar",
         "lib/javafx-swt.jar",
         "lib/javafx.web.jar",
         "lib/javafx.swing.jar",

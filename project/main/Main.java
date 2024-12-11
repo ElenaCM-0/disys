@@ -707,7 +707,7 @@ public class Main {
                 requestProcessed = true;
                 exit = true;
                 musicPlayerTask.stop();
-                continue;
+                return;
             }
 
             Action matchedAction = Action.match(action);

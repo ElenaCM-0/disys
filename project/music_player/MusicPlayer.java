@@ -248,6 +248,10 @@ public class MusicPlayer {
      * @return status (playing or paused) of the player
      */
     public Status getStatus() {
+        if (this.player == null) {
+            return null;
+        }
+        
         MediaPlayer.Status playerStatus = this.player.getStatus();
         int attemps = 5;
 

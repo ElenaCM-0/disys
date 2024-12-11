@@ -60,8 +60,6 @@ public class MusicPlayerTask {
     public PlayerStatus getStatus(long time) {
 
         if (updates.isEmpty()) {
-            /** Do we delete past updates? */
-            /** TODO */
             return new PlayerStatus(this.mp.getSongInstantFromNow(time), Status.PLAYING);
         }
 
