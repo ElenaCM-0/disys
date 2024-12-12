@@ -257,22 +257,33 @@ public class Main {
         System.out.println("Exiting app...");
         P2PConnection conn;
         for (Entry<P2PConnection, Thread> e : this.connectionThreads.entrySet()) {
-            conn = e.getKey();
-            
-            conn.close();
-
-            endP2PThread(e.getValue());
+            try {
+                conn = e.getKey();
+                
+                conn.close();
+    
+                endP2PThread(e.getValue());
+            } catch (Exception ex) {
+                continue;
+            }
         }
 
         if (heartbeatThread != null) {
-            if (heartbeatThread.isAlive()) {
-                heartbeatThread.interrupt();
+            try {
+                if (heartbeatThread.isAlive()) {
+                    heartbeatThread.interrupt();
+                }
+                heartbeatThread.join();
+            } catch (Exception ex) {
             }
-            heartbeatThread.join();
         }
 
-        stdinWriter.close();
-        userInput.join();
+        try {
+            stdinWriter.close();
+            userInput.join();
+        } catch (Exception ex) {
+        }
+        
     }
 
     private void joinNetwork() throws UnknownHostException, IOException, InterruptedException {
@@ -856,6 +867,7 @@ public class Main {
         waitForMain();
 
         talkToMain.unlock();
+        
     }
 
     /**
