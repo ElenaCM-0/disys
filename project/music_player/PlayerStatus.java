@@ -2,19 +2,36 @@ package music_player;
 
 import utils.SongInstant;
 
+/**
+ * Represents the full status of a music player, includinf the song and instant
+ * of the song at where the music player is positioned, and the status of the
+ * music
+ */
 public class PlayerStatus {
-    private SongInstant instant;
-    private Status status;
+    private SongInstant instant; // Name of the song and instant at where the player is positioned
+    private Status status; // Status of the music (PLAYING/PAUSED)
 
+    /**
+     * Creates a MusicPlayerStatus object with the given parameters
+     * 
+     * @param instant
+     * @param status
+     */
     public PlayerStatus(SongInstant instant, Status status) {
         this.instant = instant;
         this.status = status;
     }
 
+    /**
+     * @return SongInstant object corresponding to this status
+     */
     public SongInstant getInstant() {
         return instant;
     }
 
+    /**
+     * @return Status of the music corresponding to this status
+     */
     public Status getStatus() {
         return status;
     }

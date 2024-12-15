@@ -6,12 +6,17 @@ import java.nio.charset.StandardCharsets;
 
 import org.json.*;
 
+/**
+ * Class that represents a customized socket, used by all connections to
+ * communicate
+ */
 public class MySocket {
-    private Socket tunnel;
-    private OutputStreamWriter out;
-    private BufferedReader in;
+    private Socket tunnel; // Real socket
+    private OutputStreamWriter out; // Writer for the socket
+    private BufferedReader in; // Reader for the socket
 
-    private final int TIMEOUT = 5000;
+    private final int TIMEOUT = 5000; // Timeout that will be set to the socket so that it doesn't wait for messages
+                                      // forever
 
     /**
      * It will create the channels for socket connection
@@ -30,7 +35,7 @@ public class MySocket {
     }
 
     /**
-     * It will create the socket connection
+     * Constructor that uses ip and port to create a new socket
      * 
      * @param ip   The ip address the socket will be connected to
      * @param port The port the socket will connect to
@@ -89,7 +94,8 @@ public class MySocket {
 
     /**
      * Receives a message through the socket
-     * A call to this is blocking. It will wait until a message is received
+     * A call to this is blocking. It will wait until a message is received, except
+     * if the thread is interrupted
      * 
      * @return The JSON object that was received
      * @throws IOException
@@ -109,6 +115,8 @@ public class MySocket {
 
                 return new JSONObject(messageStr);
             } catch (IOException e) {
+                // If timeout is reached, and the thread is interrumpted, the function returns.
+                // Uf not it will continue receiving messages
                 if (Thread.currentThread().isInterrupted()) {
                     return null;
                 }
@@ -120,7 +128,8 @@ public class MySocket {
     /**
      * Receives a message of the given type through the socket. It will discard all
      * other messages
-     * A call to this is blocking. It will wait until a message is received
+     * A call to this is blocking. It will wait until a message is received, except
+     * if the thread is interrupted
      * 
      * @param type The message type that the user expects to receive
      * 
@@ -133,20 +142,35 @@ public class MySocket {
 
         while (true) {
             message = this.receive();
-            if (message == null) return null;
+            if (message == null)
+                return null;
             if (message.getString("type").equals(type))
                 return message;
         }
     }
 
+    /**
+     * Closes the socket
+     * 
+     * @throws IOException
+     */
     public void close() throws IOException {
         this.tunnel.close();
     }
 
+    /**
+     * @return if the socket is closed or not
+     */
     public boolean isClosed() {
         return this.tunnel.isClosed();
     }
 
+    /**
+     * Set the socket timeout to a certain value
+     * 
+     * @param timeout timeout to set
+     * @throws SocketException
+     */
     public void setSoTimeout(int timeout) throws SocketException {
         this.tunnel.setSoTimeout(timeout);
     }

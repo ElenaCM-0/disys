@@ -5,21 +5,45 @@ import org.json.JSONObject;
 import javafx.util.Duration;
 import utils.SongInstant;
 
+/**
+ * Class that represents an update in a party
+ */
 public class Update {
-    private Status status;
-    private long executionTime;
-    private SongInstant songInstant;
-    private int id;
-    private static int num_updates = 0;
+    private Status status; // Status of the music (PLAYING or PAUSED)
+    private long executionTime; // Time when the changes happen
+    private SongInstant songInstant; // Instant of a song at where the music player is positioned
+    private int id; // Number that identifies the update
+    private static int num_updates = 0; // Keeps track of how many updates have happened
 
+    /**
+     * Creates an update with the given parameters
+     * 
+     * @param status
+     * @param executionTime
+     * @param songName
+     * @param songTime
+     */
     public Update(Status status, long executionTime, String songName, Duration songTime) {
         this(new SongInstant(songName, songTime), status, executionTime);
     }
 
+    /**
+     * Creates an update with the given parameters
+     * 
+     * @param playerStatus
+     * @param executionTime
+     */
     public Update(PlayerStatus playerStatus, Long executionTime) {
         this(playerStatus.getInstant(), playerStatus.getStatus(), executionTime);
     }
 
+    /**
+     * Creates an update with the given parameters
+     * 
+     * @param instant
+     * @param status
+     * @param executionTime
+     */
     private Update(SongInstant instant, Status status, Long executionTime) {
         this.status = status;
         this.executionTime = executionTime;
@@ -28,28 +52,45 @@ public class Update {
         num_updates++;
     }
 
+    /**
+     * @return the status of the music (PLAYING or PAUSED)
+     */
     public Status getStatus() {
         return status;
     }
 
+    /**
+     * 
+     * @return the time when the changes are executed
+     */
     public long getExecutionTime() {
         return executionTime;
     }
 
+    /**
+     * @return song instant corresponding to the update
+     */
     public SongInstant geSongInstant() {
         return songInstant;
     }
 
+    /**
+     * @return name of the song corresponding to the update
+     */
     public String getSongName() {
         return songInstant.getSong();
     }
 
+    /**
+     * 
+     * @return instant of the song corresponding to the update
+     */
     public Duration getSongTime() {
         return songInstant.getInstant();
     }
 
     /**
-     * @return This method creates a JSON object containing all the information
+     * @return a JSON object containing all the information
      *         about the update
      */
     public JSONObject createUpdateJSON() {
