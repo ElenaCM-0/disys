@@ -1,1 +1,5 @@
-project/.vscode/settings.json
+.vscode/settings.json
+bin/*
+songs/*
+lib/*.so
+lib/javafx*
