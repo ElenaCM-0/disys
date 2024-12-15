@@ -1,3 +1,6 @@
+# Synchronized music player
+This project is part of the Distributed Systems CSM13001- course
+
 ## Folder Structure
 - `main`: contains the .java file of the main class
 
