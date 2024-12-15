@@ -31,6 +31,7 @@
 -  `lib`: contains all necessary files from the external libraries I used. You have to unzip it ecause some files are too big for GitHub
 
 ## Requirements
+
 - Java JDK 21 or newer, You can check this with:
     ```bash
     java --version
@@ -41,7 +42,9 @@
     ```bash
     sudo apt install openjfx
     ```
+    Note: The installation instructions for openjfx are specific to Linux. If you are using macOS or Windows, please refer to the official OpenJFX documentation for installation instructions for those platforms.
     - It is also necessary to have GStreamer
+    Note: GStreamer installation instructions are also for Linux. If you are using another operating system, check the relevant installation guides for macOS or Windows.
 
 
 ## How to test it
