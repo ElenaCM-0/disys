@@ -266,15 +266,17 @@ public class MusicPlayer {
             }
         }
 
+        /* Get current time and song instant */
         Duration currentDuration = this.player.getCurrentTime();
         long currentTime = Instant.now().toEpochMilli();
         SongInstant currentInstant = new SongInstant(song, currentDuration);
 
-        // If they player is paused, we will remain in the same instant.
+        /* If they player is paused, we will remain in the same instant */
         if (this.getStatus() == Status.PAUSED) {
             return currentInstant;
         }
 
+        /* Get the new song instant at the target time */
         return this.getSongInstantFrom(currentInstant, currentTime, targetTime);
     }
 

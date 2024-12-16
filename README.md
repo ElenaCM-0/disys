@@ -32,7 +32,7 @@ This project is part of the Distributed Systems CSM13001- course
     - `SharedInfo.java`: contains the class which manages shared data between threads, ensuring thread safety with a lock.
     - `SongInstant.java`: contains the class which represents a specific moment in a song, consisting of the song's name and the corresponding playback time.
 
--  `lib`: contains all necessary files from the external libraries I used. You have to unzip it ecause some files are too big for GitHub
+-  `lib`: contains all necessary files from the external libraries we've used. You have to unzip mp_lib.zip because some files are too big for GitHub
 
 ## Requirements
 
@@ -54,7 +54,7 @@ This project is part of the Distributed Systems CSM13001- course
 ## How to test it
 1. If you have downloaded and installed a new version of Java, make sure it is configured to be used in the terminal. 
 2. Unzip lib.zip
-3. Create a folder named `songs` in this directory and place the following 4 sound files inside it: `song1.mp3`, `song2.mp3`, `song3.mp3` and `song4.mp3`. If you wish to use other song names, then you must 
+3. Create a folder named `songs` in this directory and place the following 4 sound files inside it: `song1.mp3`, `song2.mp3`, `song3.mp3` and `song4.mp3`. If you wish to use other song names, then you must change line 85 of `Main.java`
 4. Connect 3 nodes to a local network.
 4. Run `Main.java` on all 3 nodes.
 5. When asked "Write the IP address of the node next to you:" only write the part of your IP address which is not the network mask.
