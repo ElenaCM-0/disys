@@ -325,7 +325,7 @@ public class Main {
         return partyRequests;
     }
 
-    /***************** THREADS RELATED *************/
+    /***************** THREAD RELATED *************/
 
     /**
      * Function that will return only when requestProcessed is true

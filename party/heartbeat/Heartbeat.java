@@ -43,10 +43,24 @@ public abstract class Heartbeat implements Runnable {
         }
     }
 
+    /**
+     * The child classes will overwrite this method with the actions that are to be taken if too long has passed
+     */
     protected abstract void adjustHeartbeat();
 
-    // TODO
+    /**
+     * This function will be overwritten in the child classes to return
+     * how much time can pass between updates. That is, if the difference 
+     * between the current time and the last update is greater than the 
+     * amount returned by this function, then it is considered that
+     * "too long has passed"
+     */
     protected abstract long MAX_DISTANCE();
 
+    /**
+     * This function will be overwritten in the child classes to return the
+     * amount of time the thread is to sleep before checking if the heartbeats
+     * are working as expected 
+     */
     protected abstract int SLEEP_SEC();
 }

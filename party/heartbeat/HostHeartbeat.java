@@ -26,11 +26,18 @@ public class HostHeartbeat extends Heartbeat {
         HostConnection.sendUpdateToMembers(new Update(status, nearestChange));
     }
 
+    /**
+     * In the host heartbeat, we allow very little tolerance to ensure no nodes
+     * will assume the host is down incorrectly
+     */
     @Override
     protected long MAX_DISTANCE() {
         return 100;
     }
 
+    /**
+     * The host thread also checks the update frequency often, for the same reason
+     */
     @Override
     protected int SLEEP_SEC() {
         return 10;
